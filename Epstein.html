@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Business Tycoon Ultimate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    :root {
+        --bg-main: #0b0b0b;
+        --bg-panel: #151515;
+        --bg-panel-alt: #1f1f1f;
+        --accent: #00e0ff;
+        --accent-soft: #00a0c0;
+        --text-main: #f5f5f5;
+        --text-muted: #aaaaaa;
+        --danger: #ff4b4b;
+        --success: #4bff7a;
+        --warning: #ffc94b;
+        --carbon-fiber: repeating-linear-gradient(
+            45deg,
+            #111 0,
+            #111 4px,
+            #181818 4px,
+            #181818 8px
+        );
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--carbon-fiber);
+        color: var(--text-main);
+        overflow: hidden;
+    }
+
+    #app {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    #sidebar {
+        width: 260px;
+        background: rgba(10,10,10,0.95);
+        border-right: 1px solid #333;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease;
+        z-index: 5;
+    }
+
+    #sidebar.collapsed {
+        transform: translateX(-260px);
+    }
+
+    #sidebar-header {
+        padding: 12px;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #333;
+    }
+
+    #sidebar-header h1 {
+        font-size: 16px;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+    }
+
+    #sidebar-toggle {
+        background: none;
+        border: 1px solid #444;
+        color: var(--text-main);
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+
+    #sidebar-content {
+        padding: 10px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    #main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: radial-gradient(circle at top, #202020 0, #050505 55%);
+    }
+
+    #top-bar {
+        padding: 8px 12px;
+        background: rgba(0,0,0,0.9);
+        border-bottom: 1px solid #333;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+    }
+
+    #top-bar span {
+        margin-right: 10px;
+    }
+
+    #top-bar .label {
+        color: var(--text-muted);
+    }
+
+    #top-bar .value {
+        font-weight: bold;
+        color: var(--accent);
+    }
+
+    #content {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+    }
+
+    #left-panel, #right-panel {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    #left-panel {
+        border-right: 1px solid #333;
+    }
+
+    .panel {
+        background: rgba(10,10,10,0.9);
+        border-radius: 6px;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border: 1px solid #333;
+    }
+
+    .panel h2 {
+        font-size: 14px;
+        margin: 0 0 6px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
+    }
+
+    .panel h3 {
+        font-size: 13px;
+        margin: 6px 0 4px 0;
+        color: var(--accent-soft);
+    }
+
+    .small-text {
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    button {
+        background: #111;
+        border: 1px solid #444;
+        color: var(--text-main);
+        padding: 4px 8px;
+        font-size: 11px;
+        cursor: pointer;
+        border-radius: 4px;
+        margin: 2px 0;
+        transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+        background: #222;
+        transform: translateY(-1px);
+    }
+
+    button:disabled {
+        opacity: 0.4;
+        cursor: default;
+        transform: none;
+    }
+
+    .btn-primary {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .btn-danger {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .btn-success {
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 1px 4px;
+        border-radius: 3px;
+        font-size: 10px;
+        margin-left: 4px;
+        background: #222;
+        color: var(--text-muted);
+    }
+
+    .tag.good { color: var(--success); }
+    .tag.bad { color: var(--danger); }
+    .tag.neutral { color: var(--accent-soft); }
+
+    .flex-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    .stat {
+        font-size: 11px;
+        margin-right: 8px;
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+    }
+
+    .stat-value {
+        font-weight: bold;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: #111;
+        border-radius: 3px;
+        overflow: hidden;
+        margin: 4px 0;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.2s ease;
+    }
+
+    .list {
+        max-height: 220px;
+        overflow-y: auto;
+        border-top: 1px solid #333;
+        margin-top: 4px;
+        padding-top: 4px;
+    }
+
+    .list-item {
+        padding: 4px 0;
+        border-bottom: 1px solid #222;
+        font-size: 11px;
+    }
+
+    .list-item:last-child {
+        border-bottom: none;
+    }
+
+    .money-positive { color: var(--success); }
+    .money-negative { color: var(--danger); }
+
+    .pill {
+        display: inline-block;
+        padding: 1px 6px;
+        border-radius: 10px;
+        font-size: 10px;
+        background: #111;
+        margin-right: 4px;
+    }
+
+    .pill-hard { color: var(--danger); border: 1px solid var(--danger); }
+    .pill-normal { color: var(--accent); border: 1px solid var(--accent); }
+    .pill-easy { color: var(--success); border: 1px solid var(--success); }
+
+    #log {
+        max-height: 160px;
+        overflow-y: auto;
+        font-size: 11px;
+    }
+
+    .log-entry {
+        margin-bottom: 2px;
+    }
+
+    .log-entry span.time {
+        color: var(--text-muted);
+        margin-right: 4px;
+    }
+
+    .log-entry span.text {
+        color: #ddd;
+    }
+
+    #main-menu {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at top, #202020 0, #000 55%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    #main-menu-inner {
+        background: rgba(5,5,5,0.95);
+        border-radius: 8px;
+        padding: 20px;
+        width: 360px;
+        border: 1px solid #444;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    #main-menu-inner h1 {
+        margin: 0 0 10px 0;
+        font-size: 20px;
+        text-align: center;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    #main-menu-inner h2 {
+        margin: 10px 0 4px 0;
+        font-size: 13px;
+        text-transform: uppercase;
+        color: var(--accent-soft);
+    }
+
+    #difficulty-buttons button {
+        width: 32%;
+    }
+
+    #theme-buttons button {
+        width: 48%;
+        margin-bottom: 4px;
+    }
+
+    #settings-row {
+        margin-top: 8px;
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+
+    input[type="checkbox"] {
+        transform: scale(0.9);
+        margin-right: 4px;
+    }
+
+    #business-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 4px;
+    }
+
+    #business-search {
+        flex: 1;
+        min-width: 120px;
+        padding: 3px 6px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background: #050505;
+        color: var(--text-main);
+        font-size: 11px;
+    }
+
+    select {
+        padding: 3px 6px;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background: #050505;
+        color: var(--text-main);
+        font-size: 11px;
+    }
+
+    #city-map {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+        font-size: 11px;
+    }
+
+    .city-tile {
+        background: #111;
+        border-radius: 4px;
+        padding: 4px;
+        border: 1px solid #333;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .city-tile.owned {
+        border-color: var(--accent);
+    }
+
+    .city-tile span.name {
+        display: block;
+        font-weight: bold;
+        color: var(--accent-soft);
+    }
+
+    .city-tile span.info {
+        display: block;
+        color: var(--text-muted);
+    }
+
+    .achievement {
+        font-size: 11px;
+        margin-bottom: 3px;
+    }
+
+    .achievement.unlocked {
+        color: var(--success);
+    }
+
+    .achievement.locked {
+        color: var(--text-muted);
+    }
+
+    /* Confirmation modal */
+    #confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 20;
+    }
+
+    #confirm-modal {
+        background: #111;
+        border-radius: 8px;
+        border: 1px solid #444;
+        width: 360px;
+        max-width: 95vw;
+        padding: 14px 16px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        font-size: 12px;
+    }
+
+    #confirm-title {
+        font-size: 14px;
+        margin-bottom: 6px;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    #confirm-icon {
+        font-size: 20px;
+        margin-right: 6px;
+    }
+
+    #confirm-risk {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+
+    #confirm-risk span {
+        padding: 1px 6px;
+        border-radius: 10px;
+        font-size: 10px;
+    }
+
+    #confirm-risk-low span {
+        border: 1px solid var(--success);
+        color: var(--success);
+    }
+
+    #confirm-risk-med span {
+        border: 1px solid var(--warning);
+        color: var(--warning);
+    }
+
+    #confirm-risk-high span {
+        border: 1px solid var(--danger);
+        color: var(--danger);
+    }
+
+    #confirm-body {
+        margin-bottom: 8px;
+    }
+
+    #confirm-body div {
+        margin-bottom: 2px;
+    }
+
+    #confirm-buttons {
+        text-align: right;
+        margin-top: 6px;
+    }
+
+    #confirm-buttons button {
+        margin-left: 6px;
+    }
+
+    @media (max-width: 900px) {
+        #sidebar {
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+        #content {
+            flex-direction: column;
+        }
+        #left-panel, #right-panel {
+            border-right: none;
+            border-bottom: 1px solid #333;
+            max-height: 50%;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div id="main-menu">
+    <div id="main-menu-inner">
+        <h1>Business Tycoon Ultimate</h1>
+        <p class="small-text" style="text-align:center;">
+            Build an empire across cities, markets, and realities.  
+            Loans, stocks, crypto, disasters, prestige, and more.
+        </p>
+
+        <h2>Difficulty</h2>
+        <div id="difficulty-buttons" class="flex-row">
+            <button data-diff="easy" class="btn-success">Easy</button>
+            <button data-diff="normal" class="btn-primary">Normal</button>
+            <button data-diff="hard" class="btn-danger">Hard</button>
+        </div>
+        <p class="small-text">
+            Easy: forgiving, faster growth.  
+            Normal: balanced.  
+            Hard: slower growth, harsher events, higher interest.
+        </p>
+
+        <h2>Theme</h2>
+        <div id="theme-buttons" class="flex-row">
+            <button data-theme="carbon" class="btn-primary">Carbon Fiber</button>
+            <button data-theme="neon">Neon Night</button>
+            <button data-theme="sunset">Sunset Gold</button>
+            <button data-theme="mono">Monochrome</button>
+        </div>
+
+        <div id="settings-row">
+            <label><input type="checkbox" id="music-toggle" checked>Music</label>
+            <label><input type="checkbox" id="sfx-toggle" checked>Sound FX</label>
+        </div>
+
+        <div style="text-align:center; margin-top:10px;">
+            <button id="start-game" class="btn-primary">Start Game</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation modal -->
+<div id="confirm-overlay">
+    <div id="confirm-modal">
+        <div class="flex-row" style="align-items:center; margin-bottom:4px;">
+            <span id="confirm-icon">🏢</span>
+            <div id="confirm-title">Confirm</div>
+        </div>
+        <div id="confirm-risk">
+            <span id="confirm-risk-chip">Risk: Low</span>
+        </div>
+        <div id="confirm-body">
+            <!-- Filled dynamically -->
+        </div>
+        <div id="confirm-buttons">
+            <button id="confirm-no" class="btn-danger">No</button>
+            <button id="confirm-yes" class="btn-success">Yes</button>
+        </div>
+    </div>
+</div>
+
+<div id="app">
+    <div id="sidebar">
+        <div id="sidebar-header">
+            <h1>Dashboard</h1>
+            <button id="sidebar-toggle">☰</button>
+        </div>
+        <div id="sidebar-content">
+            <div class="panel">
+                <h2>Core Stats</h2>
+                <div class="stat"><span class="stat-label">Cash:</span> <span id="stat-cash" class="stat-value money-positive">$0</span></div>
+                <div class="stat"><span class="stat-label">Net Worth:</span> <span id="stat-networth" class="stat-value">$0</span></div>
+                <div class="stat"><span class="stat-label">Daily Profit:</span> <span id="stat-profit" class="stat-value">$0</span></div>
+                <div class="stat"><span class="stat-label">Loans:</span> <span id="stat-loans" class="stat-value money-negative">$0</span></div>
+                <div class="stat"><span class="stat-label">Interest Rate:</span> <span id="stat-interest" class="stat-value">0%</span></div>
+                <div class="stat"><span class="stat-label">Reputation:</span> <span id="stat-rep" class="stat-value">0</span></div>
+                <div class="stat"><span class="stat-label">Customer Satisfaction:</span> <span id="stat-sat" class="stat-value">50</span></div>
+                <div class="progress-bar"><div id="rep-bar" class="progress-fill"></div></div>
+            </div>
+
+            <div class="panel">
+                <h2>Economy & Markets</h2>
+                <div class="stat"><span class="stat-label">Global Economy:</span> <span id="stat-economy" class="stat-value">Stable</span></div>
+                <div class="stat"><span class="stat-label">Stock Index:</span> <span id="stat-stock-index" class="stat-value">100</span></div>
+                <div class="stat"><span class="stat-label">Crypto Index:</span> <span id="stat-crypto-index" class="stat-value">100</span></div>
+                <div class="stat"><span class="stat-label">Insurance Coverage:</span> <span id="stat-insurance" class="stat-value">Basic</span></div>
+            </div>
+
+            <div class="panel">
+                <h2>Loans & Bank</h2>
+                <div class="small-text">Take loans to expand faster—but watch the interest and events.</div>
+                <div class="flex-row">
+                    <button id="btn-loan-10k">$10K Loan</button>
+                    <button id="btn-loan-50k">$50K Loan</button>
+                    <button id="btn-loan-200k">$200K Loan</button>
+                </div>
+                <div class="flex-row">
+                    <button id="btn-repay-10k" class="btn-success">Repay $10K</button>
+                    <button id="btn-repay-all" class="btn-success">Repay All</button>
+                </div>
+                <h3>Bank Investments</h3>
+                <div class="small-text">Low risk, slow growth.</div>
+                <div class="flex-row">
+                    <button id="btn-bank-invest-10k">Invest $10K</button>
+                    <button id="btn-bank-withdraw" class="btn-success">Withdraw All</button>
+                </div>
+                <div class="stat"><span class="stat-label">Bank Balance:</span> <span id="stat-bank" class="stat-value">$0</span></div>
+            </div>
+
+            <div class="panel">
+                <h2>Stocks & Crypto</h2>
+                <div class="small-text">High risk, high reward. Affected by economy cycles.</div>
+                <div class="flex-row">
+                    <button id="btn-stock-buy">Buy Stocks</button>
+                    <button id="btn-stock-sell" class="btn-success">Sell Stocks</button>
+                </div>
+                <div class="stat"><span class="stat-label">Stock Holdings:</span> <span id="stat-stocks" class="stat-value">$0</span></div>
+                <div class="flex-row">
+                    <button id="btn-crypto-buy">Buy Crypto</button>
+                    <button id="btn-crypto-sell" class="btn-success">Sell Crypto</button>
+                </div>
+                <div class="stat"><span class="stat-label">Crypto Holdings:</span> <span id="stat-crypto" class="stat-value">$0</span></div>
+                <div class="small-text">Black Market (very risky):</div>
+                <button id="btn-black-market" class="btn-danger">Black Market Gamble</button>
+            </div>
+
+            <div class="panel">
+                <h2>Prestige & Achievements</h2>
+                <div class="stat"><span class="stat-label">Prestige Level:</span> <span id="stat-prestige" class="stat-value">0</span></div>
+                <button id="btn-prestige" class="btn-primary">Prestige Reset</button>
+                <div class="small-text">Prestige resets your empire but grants permanent bonuses.</div>
+                <h3>Achievements</h3>
+                <div id="achievements">
+                    <div class="achievement locked" data-id="first-mil">💰 First Million</div>
+                    <div class="achievement locked" data-id="ten-biz">🏢 10 Businesses</div>
+                    <div class="achievement locked" data-id="global-mogul">🌍 Global Mogul</div>
+                    <div class="achievement locked" data-id="disaster-survivor">🔥 Disaster Survivor</div>
+                    <div class="achievement locked" data-id="stock-shark">📈 Stock Shark</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main">
+        <div id="top-bar">
+            <span><span class="label">Day:</span> <span id="top-day" class="value">1</span></span>
+            <span><span class="label">Phase:</span> <span id="top-phase" class="value">Morning</span></span>
+            <span><span class="label">Difficulty:</span> <span id="top-difficulty" class="value">Easy</span></span>
+            <span><span class="label">City:</span> <span id="top-city" class="value">Downtown</span></span>
+            <span><span class="label">Events:</span> <span id="top-event" class="value">None</span></span>
+            <button id="btn-next-phase" class="btn-primary">Next Phase</button>
+        </div>
+
+        <div id="content">
+            <div id="left-panel">
+                <div class="panel">
+                    <h2>Businesses</h2>
+                    <div id="business-controls">
+                        <input type="text" id="business-search" placeholder="Search businesses...">
+                        <select id="business-sort">
+                            <option value="name">Sort: Name</option>
+                            <option value="profit">Sort: Profit</option>
+                            <option value="cost">Sort: Cost</option>
+                            <option value="quality">Sort: Quality</option>
+                        </select>
+                    </div>
+                    <div class="small-text">
+                        Buy businesses, manage quality, and watch supply & demand.  
+                        Real estate generates rent; other businesses generate active income.
+                    </div>
+                    <div class="list" id="business-list"></div>
+                </div>
+
+                <div class="panel">
+                    <h2>City Map & Real Estate</h2>
+                    <div class="small-text">
+                        Buy districts to unlock bonuses and real estate opportunities.
+                    </div>
+                    <div id="city-map"></div>
+                    <h3>Real Estate Portfolio</h3>
+                    <div class="stat"><span class="stat-label">Properties:</span> <span id="stat-properties" class="stat-value">0</span></div>
+                    <div class="stat"><span class="stat-label">Daily Rent:</span> <span id="stat-rent" class="stat-value">$0</span></div>
+                </div>
+
+                <div class="panel">
+                    <h2>Inventory & Supply</h2>
+                    <div class="small-text">
+                        Some businesses consume inventory. Keep supply healthy to avoid penalties.
+                    </div>
+                    <div class="stat"><span class="stat-label">Inventory Level:</span> <span id="stat-inventory" class="stat-value">100</span></div>
+                    <div class="flex-row">
+                        <button id="btn-buy-inventory">Buy Inventory</button>
+                        <button id="btn-optimize-supply" class="btn-primary">Optimize Supply</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="right-panel">
+                <div class="panel">
+                    <h2>Research & Staff</h2>
+                    <div class="small-text">
+                        Research unlocks powerful bonuses. Staff improves efficiency, quality, and satisfaction.
+                    </div>
+                    <h3>Research Trees</h3>
+                    <div class="flex-row">
+                        <button class="btn-primary research-btn" data-id="marketing">Marketing</button>
+                        <button class="btn-primary research-btn" data-id="tech">Tech</button>
+                        <button class="btn-primary research-btn" data-id="realestate">Real Estate</button>
+                        <button class="btn-primary research-btn" data-id="finance">Finance</button>
+                        <button class="btn-primary research-btn" data-id="hr">HR</button>
+                        <button class="btn-primary research-btn" data-id="logistics">Logistics</button>
+                    </div>
+                    <div class="small-text" id="research-status">No active research.</div>
+
+                    <h3>Staff</h3>
+                    <div class="flex-row">
+                        <button class="staff-btn" data-id="manager">Hire Manager</button>
+                        <button class="staff-btn" data-id="analyst">Hire Analyst</button>
+                        <button class="staff-btn" data-id="marketer">Hire Marketer</button>
+                        <button class="staff-btn" data-id="engineer">Hire Engineer</button>
+                        <button class="staff-btn" data-id="realtor">Hire Realtor</button>
+                        <button class="staff-btn" data-id="support">Hire Support</button>
+                    </div>
+                    <div class="small-text" id="staff-status">Staff efficiency: <span id="stat-staff-eff">1.00x</span></div>
+                </div>
+
+                <div class="panel">
+                    <h2>Competitors & Events</h2>
+                    <div class="small-text">
+                        Competitors react to your growth. Random events and disasters can hit at the end of each day.
+                    </div>
+                    <div class="stat"><span class="stat-label">Competitor Pressure:</span> <span id="stat-competition" class="stat-value">Low</span></div>
+                    <div class="stat"><span class="stat-label">Last Disaster:</span> <span id="stat-disaster" class="stat-value">None</span></div>
+                    <button id="btn-insurance-upgrade">Upgrade Insurance</button>
+                </div>
+
+                <div class="panel">
+                    <h2>Log</h2>
+                    <div id="log"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const state = {
+        difficulty: 'easy',
+        day: 1,
+        phaseIndex: 0,
+        phases: ['Morning', 'Afternoon', 'Evening', 'Resolve'],
+        cash: 50000,
+        loans: 0,
+        interestRate: 0.02,
+        bankBalance: 0,
+        stockHoldings: 0,
+        cryptoHoldings: 0,
+        stockIndex: 100,
+        cryptoIndex: 100,
+        economy: 'Stable',
+        economyCycle: 0,
+        reputation: 0,
+        satisfaction: 50,
+        inventory: 100,
+        properties: 0,
+        rentPerDay: 0,
+        businesses: [],
+        cityTiles: [],
+        research: {
+            marketing: 0,
+            tech: 0,
+            realestate: 0,
+            finance: 0,
+            hr: 0,
+            logistics: 0
+        },
+        staff: {
+            manager: 0,
+            analyst: 0,
+            marketer: 0,
+            engineer: 0,
+            realtor: 0,
+            support: 0
+        },
+        staffEffMultiplier: 1,
+        prestige: 0,
+        achievements: {
+            'first-mil': false,
+            'ten-biz': false,
+            'global-mogul': false,
+            'disaster-survivor': false,
+            'stock-shark': false
+        },
+        lastDisaster: 'None',
+        competitionLevel: 'Low',
+        insuranceLevel: 0,
+        musicOn: true,
+        sfxOn: true
+    };
+
+    const difficultySettings = {
+        easy: {
+            startCash: 100000,
+            interest: 0.015,
+            eventChance: 0.08,
+            disasterChance: 0.02,
+            growthMultiplier: 1.2
+        },
+        normal: {
+            startCash: 50000,
+            interest: 0.02,
+            eventChance: 0.12,
+            disasterChance: 0.04,
+            growthMultiplier: 1.0
+        },
+        hard: {
+            startCash: 25000,
+            interest: 0.03,
+            eventChance: 0.18,
+            disasterChance: 0.07,
+            growthMultiplier: 0.8
+        }
+    };
+
+    const businessCatalog = [];
+    function addBusinessTemplate(name, type, baseCost, baseProfit, quality, demand, inventoryUse, icon, desc, risk) {
+        businessCatalog.push({
+            id: businessCatalog.length,
+            name,
+            type,
+            baseCost,
+            baseProfit,
+            quality,
+            demand,
+            inventoryUse,
+            icon,
+            desc,
+            risk
+        });
+    }
+
+    // Named businesses (corporate style)
+    addBusinessTemplate('UrbanCore Coffee Roasters', 'retail', 8000, 400, 60, 55, 1, '☕', 'Neighborhood coffee brand with loyal regulars.', 'low');
+    addBusinessTemplate('MetroLine Cafe & Bakery', 'retail', 15000, 900, 70, 60, 2, '🥐', 'Busy commuter cafe with strong morning traffic.', 'low');
+    addBusinessTemplate('GreenHarvest Organics Market', 'retail', 30000, 1600, 75, 65, 3, '🛒', 'Organic grocery with premium margins.', 'med');
+    addBusinessTemplate('VelvetRow Boutique', 'retail', 60000, 3200, 80, 50, 1, '👗', 'High‑end fashion boutique in a trendy district.', 'med');
+    addBusinessTemplate('CircuitWave Electronics', 'retail', 50000, 2800, 70, 60, 2, '💻', 'Consumer electronics and gadgets retailer.', 'med');
+    addBusinessTemplate('PageTurner Books & Media', 'retail', 20000, 900, 65, 55, 1, '📚', 'Cozy bookstore with events and signings.', 'low');
+    addBusinessTemplate('PixelArcade Gaming Lounge', 'retail', 35000, 1900, 72, 60, 2, '🎮', 'Social gaming hub with hourly rentals.', 'med');
+    addBusinessTemplate('Everline Fitness Studio', 'service', 40000, 2100, 75, 62, 0, '🏋️', 'Membership‑based fitness and training studio.', 'med');
+    addBusinessTemplate('SerenitySpring Spa & Wellness', 'service', 55000, 2600, 78, 64, 0, '💆', 'Premium spa with recurring clientele.', 'med');
+    addBusinessTemplate('ShineWay Auto Wash', 'service', 18000, 800, 60, 58, 0, '🚗', 'Drive‑through car wash with upsell packages.', 'low');
+    addBusinessTemplate('NorthBridge Auto Care', 'service', 45000, 2300, 68, 55, 0, '🔧', 'Full‑service auto repair and maintenance.', 'med');
+    addBusinessTemplate('FixPoint Tech Repair', 'service', 38000, 1900, 70, 60, 0, '🔌', 'Device repair center for phones and laptops.', 'med');
+    addBusinessTemplate('Paws & Polish Grooming', 'service', 22000, 1100, 72, 63, 0, '🐾', 'Pet grooming and care boutique.', 'low');
+    addBusinessTemplate('FlashFrame Photography Studio', 'service', 26000, 1200, 70, 55, 0, '📷', 'Portrait and event photography studio.', 'low');
+
+    addBusinessTemplate('NovaTech Systems', 'tech', 70000, 3800, 75, 60, 0, '💾', 'Custom software and integration services.', 'med');
+    addBusinessTemplate('OmniCore Digital', 'tech', 90000, 4500, 78, 62, 0, '🌐', 'Full‑stack digital solutions provider.', 'med');
+    addBusinessTemplate('Hyperion Cloudworks', 'tech', 120000, 6500, 80, 65, 0, '☁️', 'Cloud hosting and infrastructure services.', 'med');
+    addBusinessTemplate('StratusWave Commerce', 'tech', 60000, 3000, 72, 68, 0, '🛍️', 'E‑commerce platform with subscription tools.', 'med');
+    addBusinessTemplate('Streamline Media Network', 'tech', 50000, 2400, 70, 70, 0, '📺', 'Streaming content and creator network.', 'high');
+    addBusinessTemplate('QuantumEdge Analytics', 'tech', 140000, 7800, 82, 60, 0, '📊', 'Data analytics and AI insights provider.', 'high');
+    addBusinessTemplate('VectorShift AI Labs', 'tech', 160000, 9000, 85, 58, 0, '🤖', 'AI research and enterprise solutions.', 'high');
+
+    addBusinessTemplate('Crestline Apartments', 'realestate', 100000, 3500, 70, 60, 0, '🏢', 'Mid‑range apartment complex with stable tenants.', 'low');
+    addBusinessTemplate('Suburbia Homes Group', 'realestate', 150000, 5200, 72, 62, 0, '🏠', 'Suburban housing portfolio with families.', 'low');
+    addBusinessTemplate('Skyline Office Towers', 'realestate', 250000, 9000, 78, 65, 0, '🏙️', 'Downtown office towers with corporate leases.', 'med');
+    addBusinessTemplate('HorizonView Condominiums', 'realestate', 400000, 15000, 82, 68, 0, '🏙️', 'Luxury condos with premium amenities.', 'med');
+    addBusinessTemplate('PrimeAxis Shopping Plaza', 'realestate', 500000, 19000, 80, 60, 0, '🏬', 'Retail plaza with anchor tenants.', 'med');
+    addBusinessTemplate('Ironcrest Industrial Park', 'realestate', 600000, 21000, 75, 55, 0, '🏭', 'Industrial park for logistics and light manufacturing.', 'med');
+    addBusinessTemplate('UrbanRise Mixed‑Use Tower', 'realestate', 750000, 26000, 85, 70, 0, '🏗️', 'Mixed‑use tower with retail and residential.', 'high');
+
+    addBusinessTemplate('SteelRiver Manufacturing', 'manufacturing', 90000, 4200, 68, 55, 5, '🏭', 'Component manufacturing for regional suppliers.', 'med');
+    addBusinessTemplate('TitanForge Textiles', 'manufacturing', 130000, 5800, 70, 57, 6, '🧵', 'Textile production for clothing brands.', 'med');
+    addBusinessTemplate('HarvestLine Foods Plant', 'manufacturing', 160000, 7200, 72, 60, 7, '🍞', 'Packaged food processing facility.', 'med');
+    addBusinessTemplate('CircuitForge Assembly', 'manufacturing', 200000, 9000, 75, 62, 8, '🔩', 'Electronics assembly for OEM partners.', 'high');
+    addBusinessTemplate('CargoSphere Logistics Hub', 'logistics', 180000, 7800, 70, 65, 0, '🚚', 'Regional logistics and distribution hub.', 'med');
+    addBusinessTemplate('AtlasFlow Warehouse Network', 'logistics', 140000, 6200, 68, 63, 0, '📦', 'Warehousing and fulfillment network.', 'med');
+
+    addBusinessTemplate('RegalStone Fine Dining', 'luxury', 120000, 7000, 82, 55, 3, '🍷', 'High‑end restaurant with reservation‑only seating.', 'high');
+    addBusinessTemplate('Imperial Crest Motors', 'luxury', 300000, 18000, 85, 50, 0, '🚘', 'Luxury car dealership with premium clientele.', 'high');
+    addBusinessTemplate('OpalGate Private Clinic', 'luxury', 220000, 12000, 80, 60, 0, '🏥', 'Private medical clinic with concierge services.', 'high');
+    addBusinessTemplate('VelvetCrown Boutique Hotel', 'luxury', 260000, 14000, 82, 62, 0, '🏨', 'Boutique hotel in a prime tourist area.', 'high');
+    addBusinessTemplate('Suncrest Resort & Spa', 'luxury', 400000, 22000, 85, 65, 0, '🏝️', 'Destination resort with spa and events.', 'high');
+
+    // Extra corporate‑style businesses
+    const extraNames = [
+        ['PrimeGate Retail Group', 'retail', 22000, 1100, '🏬', 'Regional retail chain with strong branding.', 'med'],
+        ['BluePeak Outfitters', 'retail', 26000, 1300, '🥾', 'Outdoor gear and apparel retailer.', 'med'],
+        ['SilverGate Home Goods', 'retail', 28000, 1400, '🛋️', 'Home decor and furnishings store.', 'med'],
+        ['NorthStar Convenience', 'retail', 18000, 800, '🏪', 'Neighborhood convenience store chain.', 'low'],
+        ['MetroPulse Fitness', 'service', 32000, 1600, '🏃', 'Urban fitness and training center.', 'med'],
+        ['ClearView Accounting', 'service', 30000, 1500, '📑', 'Accounting and financial services firm.', 'low'],
+        ['BrightPath Consulting', 'service', 34000, 1700, '💼', 'Business consulting and strategy advisory.', 'med'],
+        ['OmniServe Cleaning', 'service', 20000, 900, '🧹', 'Commercial cleaning and maintenance services.', 'low'],
+        ['NovaLink IT Support', 'service', 36000, 1800, '🖥️', 'Managed IT and support services.', 'med'],
+        ['CityLine Courier', 'logistics', 26000, 1300, '📦', 'Urban courier and delivery network.', 'low'],
+        ['SkyBridge Freight', 'logistics', 42000, 2100, '🚛', 'Regional freight and trucking company.', 'med'],
+        ['IronGate Fabrication', 'manufacturing', 60000, 3000, '⚙️', 'Metal fabrication and custom parts.', 'med'],
+        ['BrightWave Solar', 'manufacturing', 80000, 3800, '🔆', 'Solar panel manufacturing and installation.', 'med'],
+        ['ApexLogic SaaS Suite', 'tech', 110000, 6000, '🧩', 'Subscription‑based business software suite.', 'high'],
+        ['CloudBridge Backup', 'tech', 95000, 4800, '💽', 'Cloud backup and disaster recovery.', 'med'],
+        ['DataHarbor Security', 'tech', 130000, 7000, '🛡️', 'Cybersecurity and threat monitoring.', 'high'],
+        ['SummitPoint Realty', 'realestate', 210000, 7800, '🏘️', 'Residential real estate portfolio.', 'med'],
+        ['CrestGate Commercial', 'realestate', 280000, 9800, '🏢', 'Commercial office and retail spaces.', 'med'],
+        ['HarborView Residences', 'realestate', 320000, 11500, '🌊', 'Waterfront residential properties.', 'med'],
+        ['GoldenSpire Towers', 'realestate', 520000, 20000, '🏙️', 'High‑rise luxury towers.', 'high']
+    ];
+
+    extraNames.forEach(([name, type, cost, profit, icon, desc, risk]) => {
+        addBusinessTemplate(name, type, cost, profit, 70, 60, type === 'manufacturing' ? 4 : 0, icon, desc, risk);
+    });
+
+    const cityTemplates = [
+        { name: 'Downtown', bonus: 'Retail +10%', cost: 50000 },
+        { name: 'Tech Park', bonus: 'Tech +15%', cost: 80000 },
+        { name: 'Harbor', bonus: 'Logistics +15%', cost: 70000 },
+        { name: 'Suburbs', bonus: 'Real Estate +10%', cost: 60000 },
+        { name: 'Financial District', bonus: 'Stocks +10%', cost: 90000 },
+        { name: 'Industrial Zone', bonus: 'Manufacturing +15%', cost: 75000 },
+        { name: 'Tourist Strip', bonus: 'Luxury +15%', cost: 85000 },
+        { name: 'Old Town', bonus: 'Reputation +10', cost: 40000 },
+        { name: 'University Area', bonus: 'Research +10%', cost: 65000 }
+    ];
+
+    function $(id) { return document.getElementById(id); }
+
+    function formatMoney(n) {
+        const sign = n < 0 ? '-' : '';
+        n = Math.abs(n);
+        if (n >= 1e9) return sign + '$' + (n / 1e9).toFixed(2) + 'B';
+        if (n >= 1e6) return sign + '$' + (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return sign + '$' + (n / 1e3).toFixed(1) + 'K';
+        return sign + '$' + n.toFixed(0);
+    }
+
+    function log(text, type = 'info') {
+        const logEl = $('log');
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'time';
+        timeSpan.textContent = '[D' + state.day + ' ' + state.phases[state.phaseIndex][0] + ']';
+        const textSpan = document.createElement('span');
+        textSpan.className = 'text';
+        textSpan.textContent = text;
+        if (type === 'good') textSpan.style.color = '#4bff7a';
+        if (type === 'bad') textSpan.style.color = '#ff4b4b';
+        entry.appendChild(timeSpan);
+        entry.appendChild(textSpan);
+        logEl.prepend(entry);
+        while (logEl.children.length > 80) {
+            logEl.removeChild(logEl.lastChild);
+        }
+    }
+
+    function playSfx() {
+        if (!state.sfxOn) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.value = 600;
+            gain.gain.setValueAtTime(0.05, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.1);
+        } catch (e) {}
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'carbon') {
+            document.body.style.background = 'var(--carbon-fiber)';
+        } else if (theme === 'neon') {
+            document.body.style.background = 'radial-gradient(circle at top, #1a0033 0, #020008 55%)';
+        } else if (theme === 'sunset') {
+            document.body.style.background = 'linear-gradient(135deg, #ff9a3c, #ff3c6c, #2b1b4b)';
+        } else if (theme === 'mono') {
+            document.body.style.background = '#050505';
+        }
+    }
+
+    function initCityTiles() {
+        state.cityTiles = cityTemplates.map((t, idx) => ({
+            id: idx,
+            name: t.name,
+            bonus: t.bonus,
+            cost: t.cost,
+            owned: idx === 0
+        }));
+    }
+
+    function renderCityMap() {
+        const mapEl = $('city-map');
+        mapEl.innerHTML = '';
+        state.cityTiles.forEach(tile => {
+            const div = document.createElement('div');
+            div.className = 'city-tile' + (tile.owned ? ' owned' : '');
+            div.dataset.id = tile.id;
+            const name = document.createElement('span');
+            name.className = 'name';
+            name.textContent = tile.name;
+            const info = document.createElement('span');
+            info.className = 'info';
+            info.textContent = tile.owned ? tile.bonus : 'Buy: ' + formatMoney(tile.cost);
+            div.appendChild(name);
+            div.appendChild(info);
+            div.onclick = () => {
+                if (tile.owned) {
+                    log('You already own ' + tile.name + '.', 'info');
+                    return;
+                }
+                const cost = tile.cost;
+                if (state.cash < cost) {
+                    log('Not enough cash to buy ' + tile.name + '.', 'bad');
+                    return;
+                }
+                showConfirm({
+                    title: 'Acquire District',
+                    icon: '🏙️',
+                    risk: 'low',
+                    desc: 'Purchase ' + tile.name + ' and unlock its permanent bonus.',
+                    cost: cost,
+                    profitDelta: 0,
+                    payback: null,
+                    longTerm: null,
+                    extra: [
+                        'Bonus: ' + tile.bonus,
+                        'Permanent strategic advantage in this region.'
+                    ]
+                }, () => {
+                    state.cash -= cost;
+                    tile.owned = true;
+                    log('You acquired ' + tile.name + '! Bonus: ' + tile.bonus, 'good');
+                    updateStats();
+                    renderCityMap();
+                });
+            };
+            mapEl.appendChild(div);
+        });
+    }
+
+    function initBusinesses() {
+        state.businesses = businessCatalog.map(b => ({
+            ...b,
+            owned: false,
+            level: 0,
+            quality: b.quality,
+            demand: b.demand
+        }));
+    }
+
+    function getBusinessMultiplier(biz) {
+        let mult = 1;
+        mult *= difficultySettings[state.difficulty].growthMultiplier;
+
+        if (biz.type === 'retail' || biz.type === 'service') mult *= 1 + state.research.marketing * 0.05;
+        if (biz.type === 'tech') mult *= 1 + state.research.tech * 0.06;
+        if (biz.type === 'realestate') mult *= 1 + state.research.realestate * 0.06;
+        if (biz.type === 'manufacturing' || biz.type === 'logistics') mult *= 1 + state.research.logistics * 0.05;
+        if (biz.type === 'luxury') mult *= 1 + state.research.marketing * 0.03 + state.research.tech * 0.02;
+
+        mult *= state.staffEffMultiplier;
+
+        state.cityTiles.forEach(tile => {
+            if (!tile.owned) return;
+            if (tile.name === 'Downtown' && biz.type === 'retail') mult *= 1.10;
+            if (tile.name === 'Tech Park' && biz.type === 'tech') mult *= 1.15;
+            if (tile.name === 'Harbor' && biz.type === 'logistics') mult *= 1.15;
+            if (tile.name === 'Suburbs' && biz.type === 'realestate') mult *= 1.10;
+            if (tile.name === 'Tourist Strip' && biz.type === 'luxury') mult *= 1.15;
+        });
+
+        mult *= 1 + state.prestige * 0.1;
+        mult *= 0.5 + state.satisfaction / 100;
+        mult *= 0.8 + state.reputation / 200;
+
+        return mult;
+    }
+
+    function renderBusinesses() {
+        const listEl = $('business-list');
+        const search = $('business-search').value.toLowerCase();
+        const sort = $('business-sort').value;
+
+        let arr = state.businesses.slice();
+        if (search) {
+            arr = arr.filter(b => b.name.toLowerCase().includes(search));
+        }
+
+        arr.sort((a, b) => {
+            if (sort === 'name') return a.name.localeCompare(b.name);
+            if (sort === 'profit') return (b.baseProfit - a.baseProfit);
+            if (sort === 'cost') return (a.baseCost - b.baseCost);
+            if (sort === 'quality') return (b.quality - a.quality);
+            return 0;
+        });
+
+        listEl.innerHTML = '';
+        arr.forEach(biz => {
+            const div = document.createElement('div');
+            div.className = 'list-item';
+
+            const title = document.createElement('div');
+            title.innerHTML = '<strong>' + biz.name + '</strong> <span class="tag">' + biz.type + '</span>' +
+                (biz.owned ? '<span class="tag good">Owned Lv.' + biz.level + '</span>' : '');
+            div.appendChild(title);
+
+            const mult = getBusinessMultiplier(biz);
+            const profit = biz.baseProfit * (1 + biz.level * 0.25) * mult;
+            const cost = biz.baseCost * (1 + biz.level * 0.4);
+
+            const info = document.createElement('div');
+            info.className = 'small-text';
+            info.innerHTML =
+                'Cost: ' + formatMoney(cost) +
+                ' | Base Profit: ' + formatMoney(biz.baseProfit) +
+                ' | Est. Profit: <span class="money-positive">' + formatMoney(profit) + '</span>' +
+                ' | Quality: ' + biz.quality +
+                ' | Demand: ' + biz.demand +
+                (biz.inventoryUse > 0 ? ' | Inventory Use: ' + biz.inventoryUse : '') +
+                (biz.desc ? '<br>' + biz.desc : '');
+            div.appendChild(info);
+
+            const btnRow = document.createElement('div');
+            btnRow.className = 'flex-row';
+
+            const buyBtn = document.createElement('button');
+            buyBtn.textContent = biz.owned ? 'Upgrade' : 'Buy';
+            buyBtn.className = 'btn-primary';
+            buyBtn.onclick = () => {
+                playSfx();
+                const currentProfit = biz.owned ? biz.baseProfit * (1 + (biz.level) * 0.25) * mult : 0;
+                const newProfit = biz.baseProfit * (1 + (biz.level + (biz.owned ? 1 : 1)) * 0.25) * mult;
+                const profitDelta = newProfit - currentProfit;
+                const payback = profitDelta > 0 ? cost / profitDelta : null;
+
+                showConfirm({
+                    title: biz.owned ? 'Confirm Upgrade' : 'Confirm Purchase',
+                    icon: biz.icon || '🏢',
+                    risk: biz.risk || 'med',
+                    desc: biz.desc || '',
+                    cost: cost,
+                    profitDelta: profitDelta,
+                    payback: payback,
+                    longTerm: profitDelta > 0 ? {
+                        d10: profitDelta * 10,
+                        d30: profitDelta * 30,
+                        d100: profitDelta * 100
+                    } : null,
+                    extra: [
+                        biz.inventoryUse > 0 ? 'Inventory usage per day: ' + biz.inventoryUse : null,
+                        'Type: ' + biz.type.toUpperCase()
+                    ].filter(Boolean)
+                }, () => {
+                    if (state.cash < cost) {
+                        log('Not enough cash for ' + (biz.owned ? 'upgrade of ' : 'purchase of ') + biz.name + '.', 'bad');
+                        return;
+                    }
+                    state.cash -= cost;
+                    if (!biz.owned) {
+                        biz.owned = true;
+                        biz.level = 1;
+                        log('You acquired ' + biz.name + '!', 'good');
+                    } else {
+                        biz.level++;
+                        log('You upgraded ' + biz.name + ' to level ' + biz.level + '.', 'good');
+                    }
+                    updateStats();
+                    renderBusinesses();
+                    checkAchievements();
+                });
+            };
+            btnRow.appendChild(buyBtn);
+
+            if (biz.type === 'realestate' && biz.owned) {
+                const rentBtn = document.createElement('button');
+                rentBtn.textContent = 'Boost Rent';
+                rentBtn.onclick = () => {
+                    playSfx();
+                    const cost = 10000;
+                    const profitDelta = biz.baseProfit * 0.15;
+                    const payback = profitDelta > 0 ? cost / profitDelta : null;
+                    showConfirm({
+                        title: 'Boost Rent',
+                        icon: '🏢',
+                        risk: 'med',
+                        desc: 'Invest in improvements to increase rental income.',
+                        cost: cost,
+                        profitDelta: profitDelta,
+                        payback: payback,
+                        longTerm: profitDelta > 0 ? {
+                            d10: profitDelta * 10,
+                            d30: profitDelta * 30,
+                            d100: profitDelta * 100
+                        } : null,
+                        extra: ['Applies only to this property.']
+                    }, () => {
+                        if (state.cash < cost) {
+                            log('Need $10K to boost rent on ' + biz.name + '.', 'bad');
+                            return;
+                        }
+                        state.cash -= cost;
+                        biz.baseProfit *= 1.15;
+                        log('You improved ' + biz.name + ' and increased rent.', 'good');
+                        updateStats();
+                        renderBusinesses();
+                    });
+                };
+                btnRow.appendChild(rentBtn);
+            }
+
+            const qualityBtn = document.createElement('button');
+            qualityBtn.textContent = 'Improve Quality';
+            qualityBtn.onclick = () => {
+                playSfx();
+                const cost = 5000;
+                const profitDelta = biz.baseProfit * 0.05;
+                const payback = profitDelta > 0 ? cost / profitDelta : null;
+                showConfirm({
+                    title: 'Improve Quality',
+                    icon: '⭐',
+                    risk: 'low',
+                    desc: 'Increase product/service quality and customer satisfaction.',
+                    cost: cost,
+                    profitDelta: profitDelta,
+                    payback: payback,
+                    longTerm: profitDelta > 0 ? {
+                        d10: profitDelta * 10,
+                        d30: profitDelta * 30,
+                        d100: profitDelta * 100
+                    } : null,
+                    extra: ['Slight boost to satisfaction and reputation over time.']
+                }, () => {
+                    if (state.cash < cost) {
+                        log('Need ' + formatMoney(cost) + ' to improve quality.', 'bad');
+                        return;
+                    }
+                    state.cash -= cost;
+                    biz.quality = Math.min(100, biz.quality + 5);
+                    state.satisfaction = Math.min(100, state.satisfaction + 1);
+                    log('Quality improved for ' + biz.name + '.', 'good');
+                    updateStats();
+                    renderBusinesses();
+                });
+            };
+            btnRow.appendChild(qualityBtn);
+
+            div.appendChild(btnRow);
+            listEl.appendChild(div);
+        });
+    }
+
+    function updateStats() {
+        const totalBizValue = state.businesses
+            .filter(b => b.owned)
+            .reduce((sum, b) => sum + b.baseCost * (1 + b.level * 0.4), 0);
+
+        const dailyProfit = computeDailyProfit();
+
+        $('stat-cash').textContent = formatMoney(state.cash);
+        $('stat-cash').className = 'stat-value ' + (state.cash >= 0 ? 'money-positive' : 'money-negative');
+        $('stat-networth').textContent = formatMoney(state.cash + totalBizValue + state.bankBalance + state.stockHoldings + state.cryptoHoldings - state.loans);
+        $('stat-profit').textContent = formatMoney(dailyProfit);
+        $('stat-loans').textContent = formatMoney(state.loans);
+        $('stat-interest').textContent = (state.interestRate * 100).toFixed(1) + '%';
+        $('stat-rep').textContent = state.reputation.toFixed(0);
+        $('stat-sat').textContent = state.satisfaction.toFixed(0);
+        $('stat-bank').textContent = formatMoney(state.bankBalance);
+        $('stat-stock-index').textContent = state.stockIndex.toFixed(0);
+        $('stat-crypto-index').textContent = state.cryptoIndex.toFixed(0);
+        $('stat-stocks').textContent = formatMoney(state.stockHoldings);
+        $('stat-crypto').textContent = formatMoney(state.cryptoHoldings);
+        $('stat-properties').textContent = state.properties;
+        $('stat-rent').textContent = formatMoney(state.rentPerDay);
+        $('stat-inventory').textContent = state.inventory.toFixed(0);
+        $('stat-prestige').textContent = state.prestige;
+        $('stat-disaster').textContent = state.lastDisaster;
+        $('stat-competition').textContent = state.competitionLevel;
+        $('stat-economy').textContent = state.economy;
+        $('top-day').textContent = state.day;
+        $('top-phase').textContent = state.phases[state.phaseIndex];
+        $('top-difficulty').textContent = state.difficulty.charAt(0).toUpperCase() + state.difficulty.slice(1);
+        $('top-city').textContent = state.cityTiles.find(t => t.owned)?.name || 'None';
+
+        const repBar = $('rep-bar');
+        repBar.style.width = Math.max(0, Math.min(100, state.reputation + 50)) + '%';
+
+        $('stat-insurance').textContent = state.insuranceLevel === 0 ? 'Basic' : state.insuranceLevel === 1 ? 'Advanced' : 'Premium';
+        $('staff-status').innerHTML = 'Staff efficiency: <span id="stat-staff-eff">' + state.staffEffMultiplier.toFixed(2) + 'x</span>';
+
+        checkAchievements();
+    }
+
+    function computeDailyProfit() {
+        let profit = 0;
+        state.rentPerDay = 0;
+        state.properties = 0;
+
+        state.businesses.forEach(biz => {
+            if (!biz.owned) return;
+            const mult = getBusinessMultiplier(biz);
+            let p = biz.baseProfit * (1 + biz.level * 0.25) * mult;
+
+            if (biz.type === 'realestate') {
+                state.rentPerDay += p;
+                state.properties++;
+            }
+
+            if (biz.inventoryUse > 0) {
+                const needed = biz.inventoryUse * (1 + biz.level * 0.2);
+                if (state.inventory >= needed) {
+                    state.inventory -= needed;
+                } else {
+                    p *= 0.5;
+                }
+            }
+
+            profit += p;
+        });
+
+        profit += state.rentPerDay;
+        profit += state.bankBalance * 0.002;
+
+        if (state.competitionLevel === 'Medium') profit *= 0.95;
+        if (state.competitionLevel === 'High') profit *= 0.9;
+
+        return profit;
+    }
+
+    function resolveDay() {
+        const dailyProfit = computeDailyProfit();
+        state.cash += dailyProfit;
+
+        if (state.loans > 0) {
+            const interest = state.loans * state.interestRate;
+            state.cash -= interest;
+            log('Paid loan interest: ' + formatMoney(interest) + '.', 'bad');
+        }
+
+        if (state.bankBalance > 0) {
+            const bankGain = state.bankBalance * 0.003;
+            state.bankBalance += bankGain;
+            log('Bank investment gained: ' + formatMoney(bankGain) + '.', 'good');
+        }
+
+        state.economyCycle++;
+        if (state.economyCycle % 5 === 0) {
+            const roll = Math.random();
+            if (roll < 0.3) {
+                state.economy = 'Boom';
+                state.stockIndex *= 1.15;
+                state.cryptoIndex *= 1.2;
+            } else if (roll < 0.7) {
+                state.economy = 'Stable';
+                state.stockIndex *= 1.02;
+                state.cryptoIndex *= 1.05;
+            } else {
+                state.economy = 'Recession';
+                state.stockIndex *= 0.85;
+                state.cryptoIndex *= 0.8;
+            }
+        } else {
+            state.stockIndex *= 0.98 + Math.random() * 0.04;
+            state.cryptoIndex *= 0.95 + Math.random() * 0.1;
+        }
+
+        const diff = difficultySettings[state.difficulty];
+        if (Math.random() < diff.eventChance) {
+            triggerRandomEvent();
+        }
+
+        if (Math.random() < diff.disasterChance) {
+            triggerDisaster();
+        }
+
+        const ownedCount = state.businesses.filter(b => b.owned).length;
+        if (ownedCount > 25) state.competitionLevel = 'High';
+        else if (ownedCount > 10) state.competitionLevel = 'Medium';
+        else state.competitionLevel = 'Low';
+
+        state.reputation = Math.max(-50, Math.min(100, state.reputation + (state.satisfaction - 50) / 50));
+        state.satisfaction = Math.max(0, Math.min(100, state.satisfaction + (Math.random() * 4 - 2)));
+
+        checkAchievements();
+        updateStats();
+        renderBusinesses();
+    }
+
+    function triggerRandomEvent() {
+        const roll = Math.random();
+        if (roll < 0.25) {
+            const bonus = 5000 + Math.random() * 15000;
+            state.cash += bonus;
+            log('Positive PR event boosted your brand! Bonus: ' + formatMoney(bonus) + '.', 'good');
+            state.reputation += 5;
+        } else if (roll < 0.5) {
+            const fine = 5000 + Math.random() * 20000;
+            state.cash -= fine;
+            log('Regulatory fine issued: ' + formatMoney(fine) + '.', 'bad');
+            state.reputation -= 5;
+        } else if (roll < 0.75) {
+            state.satisfaction += 5;
+            log('Customer satisfaction increased due to excellent service.', 'good');
+        } else {
+            state.satisfaction -= 5;
+            log('Competitor launched an aggressive campaign. Satisfaction dipped.', 'bad');
+        }
+    }
+
+    function triggerDisaster() {
+        const roll = Math.random();
+        let loss = 0;
+        if (roll < 0.33) {
+            loss = 0.1;
+            state.lastDisaster = 'Fire';
+        } else if (roll < 0.66) {
+            loss = 0.15;
+            state.lastDisaster = 'Flood';
+        } else {
+            loss = 0.2;
+            state.lastDisaster = 'Cyber Attack';
+        }
+
+        const mitigation = state.insuranceLevel * 0.05;
+        loss = Math.max(0, loss - mitigation);
+
+        const totalBizValue = state.businesses
+            .filter(b => b.owned)
+            .reduce((sum, b) => sum + b.baseCost * (1 + b.level * 0.4), 0);
+
+        const damage = totalBizValue * loss;
+        state.cash -= damage;
+        log('Disaster struck: ' + state.lastDisaster + '! Loss: ' + formatMoney(damage) + '.', 'bad');
+        state.reputation -= 10;
+        state.satisfaction -= 10;
+
+        state.achievements['disaster-survivor'] = true;
+    }
+
+    function checkAchievements() {
+        const netWorth = state.cash + state.bankBalance + state.stockHoldings + state.cryptoHoldings +
+            state.businesses.filter(b => b.owned).reduce((sum, b) => sum + b.baseCost * (1 + b.level * 0.4), 0) - state.loans;
+
+        if (netWorth >= 1_000_000) state.achievements['first-mil'] = true;
+        if (state.businesses.filter(b => b.owned).length >= 10) state.achievements['ten-biz'] = true;
+        if (state.cityTiles.filter(t => t.owned).length >= 5) state.achievements['global-mogul'] = true;
+        if (state.stockHoldings >= 200000) state.achievements['stock-shark'] = true;
+
+        Object.keys(state.achievements).forEach(id => {
+            const el = document.querySelector('.achievement[data-id="' + id + '"]');
+            if (!el) return;
+            if (state.achievements[id]) {
+                el.classList.remove('locked');
+                el.classList.add('unlocked');
+            }
+        });
+    }
+
+    function canPrestige() {
+        const netWorth = state.cash + state.bankBalance + state.stockHoldings + state.cryptoHoldings +
+            state.businesses.filter(b => b.owned).reduce((sum, b) => sum + b.baseCost * (1 + b.level * 0.4), 0) - state.loans;
+        return netWorth >= 2_000_000;
+    }
+
+    function doPrestige() {
+        if (!canPrestige()) {
+            log('You need at least $2M net worth to prestige.', 'bad');
+            return;
+        }
+        state.prestige++;
+        log('Prestige! Your empire resets but you gain permanent bonuses.', 'good');
+
+        state.cash = 50000;
+        state.loans = 0;
+        state.bankBalance = 0;
+        state.stockHoldings = 0;
+        state.cryptoHoldings = 0;
+        state.reputation = 0;
+        state.satisfaction = 50;
+        state.inventory = 100;
+        state.day = 1;
+        state.phaseIndex = 0;
+        state.lastDisaster = 'None';
+        state.competitionLevel = 'Low';
+        state.insuranceLevel = 0;
+        state.economy = 'Stable';
+        state.stockIndex = 100;
+        state.cryptoIndex = 100;
+        state.economyCycle = 0;
+
+        state.staffEffMultiplier += 0.1;
+
+        initBusinesses();
+        initCityTiles();
+        renderCityMap();
+        renderBusinesses();
+        updateStats();
+    }
+
+    // Confirmation modal logic
+    let confirmCallback = null;
+
+    function showConfirm(data, onYes) {
+        confirmCallback = onYes;
+        $('confirm-title').textContent = data.title || 'Confirm';
+        $('confirm-icon').textContent = data.icon || '🏢';
+
+        const riskChip = $('confirm-risk-chip');
+        let riskText = 'Risk: Medium';
+        riskChip.style.borderColor = '';
+        riskChip.style.color = '';
+        if (data.risk === 'low') {
+            riskText = 'Risk: Low';
+            riskChip.style.borderColor = '#4bff7a';
+            riskChip.style.color = '#4bff7a';
+        } else if (data.risk === 'high') {
+            riskText = 'Risk: High';
+            riskChip.style.borderColor = '#ff4b4b';
+            riskChip.style.color = '#ff4b4b';
+        } else {
+            riskText = 'Risk: Medium';
+            riskChip.style.borderColor = '#ffc94b';
+            riskChip.style.color = '#ffc94b';
+        }
+        riskChip.textContent = riskText;
+
+        const body = $('confirm-body');
+        body.innerHTML = '';
+
+        if (data.desc) {
+            const d = document.createElement('div');
+            d.textContent = data.desc;
+            body.appendChild(d);
+        }
+
+        const costLine = document.createElement('div');
+        costLine.innerHTML = 'This will cost: <span class="money-negative">' + formatMoney(data.cost || 0) + '</span>';
+        body.appendChild(costLine);
+
+        if (data.profitDelta != null) {
+            const pLine = document.createElement('div');
+            const signClass = data.profitDelta >= 0 ? 'money-positive' : 'money-negative';
+            pLine.innerHTML = 'Estimated daily profit change: <span class="' + signClass + '">' + formatMoney(data.profitDelta) + '</span>';
+            body.appendChild(pLine);
+        }
+
+        if (data.payback != null && data.payback > 0) {
+            const pbLine = document.createElement('div');
+            pbLine.textContent = 'Estimated payback time: ' + data.payback.toFixed(1) + ' days';
+            body.appendChild(pbLine);
+        }
+
+        if (data.longTerm) {
+            const lt = document.createElement('div');
+            lt.className = 'small-text';
+            lt.textContent = 'Projected profit: 10d ' + formatMoney(data.longTerm.d10) +
+                ' • 30d ' + formatMoney(data.longTerm.d30) +
+                ' • 100d ' + formatMoney(data.longTerm.d100);
+            body.appendChild(lt);
+        }
+
+        if (data.extra && data.extra.length) {
+            data.extra.forEach(line => {
+                const e = document.createElement('div');
+                e.className = 'small-text';
+                e.textContent = line;
+                body.appendChild(e);
+            });
+        }
+
+        $('confirm-overlay').style.display = 'flex';
+    }
+
+    function hideConfirm() {
+        $('confirm-overlay').style.display = 'none';
+        confirmCallback = null;
+    }
+
+    function setupHandlers() {
+        $('sidebar-toggle').onclick = () => {
+            $('sidebar').classList.toggle('collapsed');
+        };
+
+        $('business-search').oninput = renderBusinesses;
+        $('business-sort').onchange = renderBusinesses;
+
+        $('btn-next-phase').onclick = () => {
+            playSfx();
+            state.phaseIndex++;
+            if (state.phaseIndex >= state.phases.length) {
+                state.phaseIndex = 0;
+                state.day++;
+                resolveDay();
+            }
+            updateStats();
+        };
+
+        $('btn-loan-10k').onclick = () => takeLoan(10000);
+        $('btn-loan-50k').onclick = () => takeLoan(50000);
+        $('btn-loan-200k').onclick = () => takeLoan(200000);
+        $('btn-repay-10k').onclick = () => repayLoan(10000);
+        $('btn-repay-all').onclick = () => repayLoan(state.loans);
+
+        $('btn-bank-invest-10k').onclick = () => {
+            const cost = 10000;
+            const profitDelta = state.bankBalance * 0.003 + 30; // rough
+            const payback = profitDelta > 0 ? cost / profitDelta : null;
+            showConfirm({
+                title: 'Bank Investment',
+                icon: '🏦',
+                risk: 'low',
+                desc: 'Invest cash into a low‑risk bank product.',
+                cost: cost,
+                profitDelta: profitDelta,
+                payback: payback,
+                longTerm: profitDelta > 0 ? {
+                    d10: profitDelta * 10,
+                    d30: profitDelta * 30,
+                    d100: profitDelta * 100
+                } : null,
+                extra: ['Safe but slow growth.']
+            }, () => {
+                if (state.cash < cost) {
+                    log('Not enough cash to invest $10K.', 'bad');
+                    return;
+                }
+                state.cash -= cost;
+                state.bankBalance += cost;
+                log('Invested $10K in bank.', 'good');
+                updateStats();
+            });
+        };
+
+        $('btn-bank-withdraw').onclick = () => {
+            if (state.bankBalance <= 0) {
+                log('No bank balance to withdraw.', 'bad');
+                return;
+            }
+            showConfirm({
+                title: 'Withdraw Bank Funds',
+                icon: '🏦',
+                risk: 'low',
+                desc: 'Withdraw all funds from your bank investment.',
+                cost: 0,
+                profitDelta: 0,
+                payback: null,
+                longTerm: null,
+                extra: ['You will stop earning bank interest on this amount.']
+            }, () => {
+                state.cash += state.bankBalance;
+                log('Withdrew ' + formatMoney(state.bankBalance) + ' from bank.', 'good');
+                state.bankBalance = 0;
+                updateStats();
+            });
+        };
+
+        $('btn-stock-buy').onclick = () => {
+            const amount = 10000;
+            const profitDelta = amount * (state.stockIndex / 100 * 0.02);
+            const payback = null;
+            showConfirm({
+                title: 'Buy Stocks',
+                icon: '📈',
+                risk: 'med',
+                desc: 'Purchase a diversified stock portfolio.',
+                cost: amount,
+                profitDelta: profitDelta,
+                payback: payback,
+                longTerm: profitDelta ? {
+                    d10: profitDelta * 10,
+                    d30: profitDelta * 30,
+                    d100: profitDelta * 100
+                } : null,
+                extra: ['Value fluctuates with the stock index.']
+            }, () => {
+                if (state.cash < amount) {
+                    log('Need ' + formatMoney(amount) + ' to buy stocks.', 'bad');
+                    return;
+                }
+                state.cash -= amount;
+                state.stockHoldings += amount;
+                log('Bought ' + formatMoney(amount) + ' in stocks.', 'good');
+                updateStats();
+            });
+        };
+
+        $('btn-stock-sell').onclick = () => {
+            if (state.stockHoldings <= 0) {
+                log('No stocks to sell.', 'bad');
+                return;
+            }
+            const value = state.stockHoldings * (state.stockIndex / 100);
+            showConfirm({
+                title: 'Sell Stocks',
+                icon: '📉',
+                risk: 'med',
+                desc: 'Liquidate your stock holdings at current market value.',
+                cost: 0,
+                profitDelta: 0,
+                payback: null,
+                longTerm: null,
+                extra: ['You will realize gains or losses based on the index.']
+            }, () => {
+                state.cash += value;
+                log('Sold stocks for ' + formatMoney(value) + '.', 'good');
+                state.stockHoldings = 0;
+                updateStats();
+            });
+        };
+
+        $('btn-crypto-buy').onclick = () => {
+            const amount = 10000;
+            const profitDelta = amount * 0.05;
+            showConfirm({
+                title: 'Buy Crypto',
+                icon: '🪙',
+                risk: 'high',
+                desc: 'Speculate on a volatile crypto asset.',
+                cost: amount,
+                profitDelta: profitDelta,
+                payback: null,
+                longTerm: profitDelta ? {
+                    d10: profitDelta * 10,
+                    d30: profitDelta * 30,
+                    d100: profitDelta * 100
+                } : null,
+                extra: ['High volatility. Value can swing wildly.']
+            }, () => {
+                if (state.cash < amount) {
+                    log('Need ' + formatMoney(amount) + ' to buy crypto.', 'bad');
+                    return;
+                }
+                state.cash -= amount;
+                state.cryptoHoldings += amount;
+                log('Bought ' + formatMoney(amount) + ' in crypto.', 'good');
+                updateStats();
+            });
+        };
+
+        $('btn-crypto-sell').onclick = () => {
+            if (state.cryptoHoldings <= 0) {
+                log('No crypto to sell.', 'bad');
+                return;
+            }
+            const value = state.cryptoHoldings * (state.cryptoIndex / 100);
+            showConfirm({
+                title: 'Sell Crypto',
+                icon: '🪙',
+                risk: 'high',
+                desc: 'Sell your crypto at current market value.',
+                cost: 0,
+                profitDelta: 0,
+                payback: null,
+                longTerm: null,
+                extra: ['You lock in gains or losses at this price.']
+            }, () => {
+                state.cash += value;
+                log('Sold crypto for ' + formatMoney(value) + '.', 'good');
+                state.cryptoHoldings = 0;
+                updateStats();
+            });
+        };
+
+        $('btn-black-market').onclick = () => {
+            playSfx();
+            if (state.cash < 5000) {
+                log('You need at least $5K to gamble on the black market.', 'bad');
+                return;
+            }
+            const stake = 5000;
+            showConfirm({
+                title: 'Black Market Gamble',
+                icon: '💀',
+                risk: 'high',
+                desc: 'Extremely risky, unregulated deal with unpredictable outcomes.',
+                cost: stake,
+                profitDelta: 0,
+                payback: null,
+                longTerm: null,
+                extra: ['You could lose everything or win big. Reputation may suffer.']
+            }, () => {
+                state.cash -= stake;
+                const roll = Math.random();
+                if (roll < 0.2) {
+                    const win = stake * 10;
+                    state.cash += win;
+                    log('Black market jackpot! You gained ' + formatMoney(win) + '.', 'good');
+                } else if (roll < 0.6) {
+                    const win = stake * 2;
+                    state.cash += win;
+                    log('Black market profit: ' + formatMoney(win) + '.', 'good');
+                } else {
+                    log('Black market deal went bad. You lost your stake.', 'bad');
+                    state.reputation -= 5;
+                }
+                updateStats();
+            });
+        };
+
+        $('btn-buy-inventory').onclick = () => {
+            const cost = 5000;
+            const profitDelta = 0;
+            showConfirm({
+                title: 'Buy Inventory',
+                icon: '📦',
+                risk: 'low',
+                desc: 'Purchase additional inventory for product‑based businesses.',
+                cost: cost,
+                profitDelta: profitDelta,
+                payback: null,
+                longTerm: null,
+                extra: ['Increases buffer against inventory shortages.']
+            }, () => {
+                if (state.cash < cost) {
+                    log('Need ' + formatMoney(cost) + ' to buy inventory.', 'bad');
+                    return;
+                }
+                state.cash -= cost;
+                state.inventory += 100;
+                log('Purchased inventory. +100 units.', 'good');
+                updateStats();
+            });
+        };
+
+        $('btn-optimize-supply').onclick = () => {
+            const cost = 8000;
+            const profitDelta = 0;
+            showConfirm({
+                title: 'Optimize Supply',
+                icon: '🚚',
+                risk: 'low',
+                desc: 'Improve logistics and supply chain efficiency.',
+                cost: cost,
+                profitDelta: profitDelta,
+                payback: null,
+                longTerm: null,
+                extra: ['Boosts logistics research and slightly improves efficiency.']
+            }, () => {
+                if (state.cash < cost) {
+                    log('Need ' + formatMoney(cost) + ' to optimize supply.', 'bad');
+                    return;
+                }
+                state.cash -= cost;
+                state.inventory += 50;
+                state.research.logistics += 1;
+                log('Optimized supply chain. Logistics research improved.', 'good');
+                updateStats();
+            });
+        };
+
+        document.querySelectorAll('.research-btn').forEach(btn => {
+            btn.onclick = () => {
+                playSfx();
+                const id = btn.dataset.id;
+                const cost = 15000 + state.research[id] * 10000;
+                const profitDelta = 0;
+                showConfirm({
+                    title: 'Research: ' + id.toUpperCase(),
+                    icon: '🔬',
+                    risk: 'low',
+                    desc: 'Invest in ' + id.toUpperCase() + ' research to unlock long‑term bonuses.',
+                    cost: cost,
+                    profitDelta: profitDelta,
+                    payback: null,
+                    longTerm: null,
+                    extra: ['Each level increases related business performance.']
+                }, () => {
+                    if (state.cash < cost) {
+                        log('Need ' + formatMoney(cost) + ' for ' + id + ' research.', 'bad');
+                        return;
+                    }
+                    state.cash -= cost;
+                    state.research[id]++;
+                    $('research-status').textContent = id.toUpperCase() + ' research level: ' + state.research[id];
+                    log('Research upgraded: ' + id.toUpperCase() + ' Lv.' + state.research[id] + '.', 'good');
+                    updateStats();
+                });
+            };
+        });
+
+        document.querySelectorAll('.staff-btn').forEach(btn => {
+            btn.onclick = () => {
+                playSfx();
+                const id = btn.dataset.id;
+                const cost = 10000 + state.staff[id] * 8000;
+                const profitDelta = 0;
+                showConfirm({
+                    title: 'Hire ' + id.charAt(0).toUpperCase() + id.slice(1),
+                    icon: '👤',
+                    risk: 'low',
+                    desc: 'Add more ' + id + ' staff to improve operations.',
+                    cost: cost,
+                    profitDelta: profitDelta,
+                    payback: null,
+                    longTerm: null,
+                    extra: ['Increases overall staff efficiency multiplier.']
+                }, () => {
+                    if (state.cash < cost) {
+                        log('Need ' + formatMoney(cost) + ' to hire more ' + id + '.', 'bad');
+                        return;
+                    }
+                    state.cash -= cost;
+                    state.staff[id]++;
+                    recalcStaffMultiplier();
+                    log('Hired ' + id + '. Total: ' + state.staff[id] + '.', 'good');
+                    updateStats();
+                });
+            };
+        });
+
+        $('btn-insurance-upgrade').onclick = () => {
+            const cost = [20000, 40000, 0][state.insuranceLevel];
+            if (state.insuranceLevel >= 2) {
+                log('Insurance already at premium level.', 'info');
+                return;
+            }
+            const nextLevel = state.insuranceLevel === 0 ? 'Advanced' : 'Premium';
+            const mitigationBefore = state.insuranceLevel * 5;
+            const mitigationAfter = (state.insuranceLevel + 1) * 5;
+            showConfirm({
+                title: 'Upgrade Insurance',
+                icon: '🛡️',
+                risk: 'low',
+                desc: 'Increase your protection against disasters.',
+                cost: cost,
+                profitDelta: 0,
+                payback: null,
+                longTerm: null,
+                extra: [
+                    'Coverage: ' + mitigationBefore + '% → ' + mitigationAfter + '% disaster loss reduction.',
+                    'New level: ' + nextLevel
+                ]
+            }, () => {
+                if (state.cash < cost) {
+                    log('Need ' + formatMoney(cost) + ' to upgrade insurance.', 'bad');
+                    return;
+                }
+                state.cash -= cost;
+                state.insuranceLevel++;
+                log('Insurance upgraded to ' + nextLevel + '.', 'good');
+                updateStats();
+            });
+        };
+
+        $('btn-prestige').onclick = () => {
+            playSfx();
+            showConfirm({
+                title: 'Prestige Reset',
+                icon: '🔥',
+                risk: 'med',
+                desc: 'Reset your empire for permanent prestige bonuses.',
+                cost: 0,
+                profitDelta: 0,
+                payback: null,
+                longTerm: null,
+                extra: ['Requires at least $2M net worth.', 'You keep prestige bonuses and staff efficiency boosts.']
+            }, () => {
+                doPrestige();
+            });
+        };
+
+        document.querySelectorAll('#difficulty-buttons button').forEach(btn => {
+            btn.onclick = () => {
+                state.difficulty = btn.dataset.diff;
+                document.querySelectorAll('#difficulty-buttons button').forEach(b => b.classList.remove('btn-success', 'btn-primary', 'btn-danger'));
+                if (state.difficulty === 'easy') btn.classList.add('btn-success');
+                if (state.difficulty === 'normal') btn.classList.add('btn-primary');
+                if (state.difficulty === 'hard') btn.classList.add('btn-danger');
+            };
+        });
+
+        document.querySelectorAll('#theme-buttons button').forEach(btn => {
+            btn.onclick = () => {
+                applyTheme(btn.dataset.theme);
+            };
+        });
+
+        $('music-toggle').onchange = e => {
+            state.musicOn = e.target.checked;
+        };
+        $('sfx-toggle').onchange = e => {
+            state.sfxOn = e.target.checked;
+        };
+
+        $('start-game').onclick = () => {
+            playSfx();
+            startGame();
+        };
+
+        $('confirm-no').onclick = () => {
+            hideConfirm();
+        };
+        $('confirm-yes').onclick = () => {
+            if (confirmCallback) confirmCallback();
+            hideConfirm();
+        };
+        $('confirm-overlay').onclick = e => {
+            if (e.target === $('confirm-overlay')) hideConfirm();
+        };
+        document.addEventListener('keydown', e => {
+            if ($('confirm-overlay').style.display === 'flex') {
+                if (e.key === 'Escape') hideConfirm();
+            }
+        });
+    }
+
+    function recalcStaffMultiplier() {
+        let mult = 1;
+        mult += state.staff.manager * 0.05;
+        mult += state.staff.analyst * 0.04;
+        mult += state.staff.marketer * 0.04;
+        mult += state.staff.engineer * 0.05;
+        mult += state.staff.realtor * 0.04;
+        mult += state.staff.support * 0.03;
+        state.staffEffMultiplier = mult;
+    }
+
+    function takeLoan(amount) {
+        playSfx();
+        showConfirm({
+            title: 'Take Loan',
+            icon: '💳',
+            risk: 'med',
+            desc: 'Borrow capital from the bank with interest.',
+            cost: 0,
+            profitDelta: 0,
+            payback: null,
+            longTerm: null,
+            extra: [
+                'Loan amount: ' + formatMoney(amount),
+                'Interest rate: ' + (state.interestRate * 100).toFixed(1) + '% per day on outstanding balance.'
+            ]
+        }, () => {
+            state.cash += amount;
+            state.loans += amount;
+            log('Took a loan of ' + formatMoney(amount) + '.', 'good');
+            updateStats();
+        });
+    }
+
+    function repayLoan(amount) {
+        playSfx();
+        if (state.loans <= 0) {
+            log('No loans to repay.', 'bad');
+            return;
+        }
+        const pay = Math.min(amount, state.loans, state.cash);
+        if (pay <= 0) {
+            log('Not enough cash to repay.', 'bad');
+            return;
+        }
+        showConfirm({
+            title: 'Repay Loan',
+            icon: '💳',
+            risk: 'low',
+            desc: 'Reduce your outstanding loan balance.',
+            cost: pay,
+            profitDelta: 0,
+            payback: null,
+            longTerm: null,
+            extra: ['Lowers future interest payments.']
+        }, () => {
+            state.cash -= pay;
+            state.loans -= pay;
+            log('Repaid ' + formatMoney(pay) + ' of loans.', 'good');
+            updateStats();
+        });
+    }
+
+    function startGame() {
+        const diff = difficultySettings[state.difficulty];
+        state.cash = diff.startCash;
+        state.loans = 0;
+        state.interestRate = diff.interest;
+        state.day = 1;
+        state.phaseIndex = 0;
+        state.reputation = 0;
+        state.satisfaction = 50;
+        state.inventory = 100;
+        state.bankBalance = 0;
+        state.stockHoldings = 0;
+        state.cryptoHoldings = 0;
+        state.stockIndex = 100;
+        state.cryptoIndex = 100;
+        state.economy = 'Stable';
+        state.economyCycle = 0;
+        state.lastDisaster = 'None';
+        state.competitionLevel = 'Low';
+        state.insuranceLevel = 0;
+
+        initBusinesses();
+        initCityTiles();
+        renderCityMap();
+        renderBusinesses();
+        updateStats();
+
+        $('main-menu').style.display = 'none';
+        log('Game started on ' + state.difficulty.toUpperCase() + ' difficulty.', 'info');
+    }
+
+    state.difficulty = 'easy';
+
+    setupHandlers();
+    initBusinesses();
+    initCityTiles();
+    renderCityMap();
+    renderBusinesses();
+    updateStats();
+})();
+</script>
+
+</body>
+</html>
