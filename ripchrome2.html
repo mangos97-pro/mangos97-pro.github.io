@@ -1,0 +1,2289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Business Tycoon++</title>
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-alt: #0b1020;
+      --panel: #111827;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --accent-strong: #0ea5e9;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+      --border: #1f2937;
+      --card-radius: 7px;
+      --shadow-soft: 0 10px 22px rgba(15, 23, 42, 0.9);
+      --shadow-small: 0 7px 16px rgba(15, 23, 42, 0.7);
+      --bg-pattern: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+    }
+
+    /* THEMES */
+    body.theme-carbon {
+      --bg: #050505;
+      --bg-alt: #101010;
+      --panel: #141414;
+      --accent: #00e5ff;
+      --accent-soft: rgba(0, 229, 255, 0.18);
+      --accent-strong: #00bcd4;
+      --text: #f5f5f5;
+      --muted: #9e9e9e;
+      --border: #262626;
+      --bg-pattern:
+        radial-gradient(circle at top, rgba(255,255,255,0.04) 0, transparent 55%),
+        repeating-linear-gradient(
+          45deg,
+          #111 0,
+          #111 2px,
+          #050505 2px,
+          #050505 4px
+        );
+    }
+
+    body.theme-neon {
+      --bg: #020617;
+      --bg-alt: #020617;
+      --panel: #020617;
+      --accent: #22d3ee;
+      --accent-soft: rgba(34, 211, 238, 0.2);
+      --accent-strong: #06b6d4;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --bg-pattern:
+        radial-gradient(circle at top, #1d4ed8 0, #020617 45%, #000 100%);
+    }
+
+    body.theme-gold {
+      --bg: #020617;
+      --bg-alt: #111827;
+      --panel: #020617;
+      --accent: #fbbf24;
+      --accent-soft: rgba(251, 191, 36, 0.18);
+      --accent-strong: #f59e0b;
+      --text: #fef3c7;
+      --muted: #e5e7eb;
+      --border: #4b5563;
+      --bg-pattern:
+        radial-gradient(circle at top, #92400e 0, #020617 45%, #000 100%);
+    }
+
+    body.theme-dark {
+      --bg: #020617;
+      --bg-alt: #020617;
+      --panel: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --accent-strong: #0ea5e9;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --bg-pattern: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+    }
+
+    body.theme-light {
+      --bg: #f3f4f6;
+      --bg-alt: #e5e7eb;
+      --panel: #ffffff;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --accent-strong: #1d4ed8;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --bg-pattern: radial-gradient(circle at top, #e5e7eb 0, #f3f4f6 45%, #e5e7eb 100%);
+    }
+
+    body.theme-terminal {
+      --bg: #020617;
+      --bg-alt: #020617;
+      --panel: #020617;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.18);
+      --accent-strong: #16a34a;
+      --text: #bbf7d0;
+      --muted: #4ade80;
+      --border: #14532d;
+      --bg-pattern:
+        radial-gradient(circle at top, #052e16 0, #020617 45%, #000 100%);
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg-pattern);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(90deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7));
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.8);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header .title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    header .logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      background: radial-gradient(circle at 30% 20%, var(--accent), var(--accent-strong) 40%, #000 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e5e7eb;
+      font-weight: 800;
+      font-size: 14px;
+      box-shadow: 0 0 16px rgba(0,0,0,0.8);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0.05em;
+    }
+
+    header .subtitle {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    header .top-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 9px;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+    }
+
+    .pill span.key {
+      padding: 1px 4px;
+      border-radius: 5px;
+      background: rgba(0,0,0,0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 8px;
+      color: #e5e7eb;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 4px 8px;
+      font-size: 10px;
+      background: radial-gradient(circle at top left, var(--accent-soft), rgba(0,0,0,0.9));
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease-out;
+      box-shadow: var(--shadow-small);
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 9px 20px rgba(0,0,0,0.9);
+      border-color: var(--accent);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-small);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-strong), var(--success));
+      border-color: rgba(56, 189, 248, 0.9);
+      color: #020617;
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      padding: 8px 10px 8px;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        flex-direction: column;
+        height: auto;
+      }
+    }
+
+    .sidebar {
+      width: 220px;
+      max-width: 100%;
+      background: rgba(0,0,0,0.7);
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 10px;
+    }
+
+    @media (max-width: 960px) {
+      .sidebar {
+        width: 100%;
+        order: 2;
+      }
+    }
+
+    .sidebar-section {
+      background: rgba(0,0,0,0.75);
+      border-radius: 7px;
+      padding: 5px 6px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      box-shadow: 0 5px 14px rgba(0,0,0,0.9);
+    }
+
+    .sidebar-section h3 {
+      margin: 0 0 3px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1px;
+      font-size: 10px;
+    }
+
+    .stat-row:last-child { margin-bottom: 0; }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .stat-value {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 10px;
+    }
+
+    .stat-value.positive { color: var(--success); }
+    .stat-value.negative { color: var(--danger); }
+
+    .money-display {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+    }
+
+    .money-display span.currency {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .xp-bar-container {
+      margin-top: 3px;
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid #111827;
+      padding: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .xp-bar {
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #a3e635, #facc15);
+      width: 0%;
+      transition: width 0.25s ease-out;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+    }
+
+    .xp-label {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8px;
+      color: var(--muted);
+    }
+
+    .menu {
+      display: flex;
+      gap: 3px;
+      flex-wrap: wrap;
+      margin-top: 3px;
+    }
+
+    .menu button {
+      flex: 1;
+      min-width: 0;
+      padding: 3px 5px;
+      font-size: 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(0,0,0,0.8);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      white-space: nowrap;
+    }
+
+    .menu button.active {
+      background: radial-gradient(circle at top left, var(--accent-soft), rgba(0,0,0,0.95));
+      color: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    .menu button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .main-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .panel {
+      background: rgba(0,0,0,0.75);
+      border-radius: 9px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      box-shadow: var(--shadow-soft);
+      padding: 6px 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 3px;
+      position: relative;
+      z-index: 1;
+      font-size: 10px;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .panel-header .tagline {
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .panel-content {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .city-grid,
+    .research-grid,
+    .staff-grid,
+    .market-grid,
+    .loan-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 5px;
+      margin-top: 3px;
+      overflow-y: auto;
+      max-height: 210px;
+      padding-right: 2px;
+    }
+
+    .city-grid::-webkit-scrollbar,
+    .research-grid::-webkit-scrollbar,
+    .staff-grid::-webkit-scrollbar,
+    .market-grid::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .city-grid::-webkit-scrollbar-thumb,
+    .research-grid::-webkit-scrollbar-thumb,
+    .staff-grid::-webkit-scrollbar-thumb,
+    .market-grid::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 999px;
+    }
+
+    .card {
+      background: rgba(0,0,0,0.85);
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      padding: 5px 6px;
+      box-shadow: 0 7px 16px rgba(0,0,0,0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      position: relative;
+      overflow: hidden;
+      font-size: 9px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 3px;
+    }
+
+    .card-title {
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .card-badge {
+      font-size: 8px;
+      padding: 1px 4px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+      background: rgba(0,0,0,0.9);
+      white-space: nowrap;
+    }
+
+    .card-main-stat {
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+    }
+
+    .card-main-stat span.unit {
+      font-size: 9px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .card-row strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 3px;
+      margin-top: 2px;
+    }
+
+    .card-actions button {
+      flex: 1;
+      padding: 2px 3px;
+      font-size: 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(0,0,0,0.95);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-actions button.primary {
+      background: radial-gradient(circle at top left, var(--accent-soft), rgba(0,0,0,0.98));
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 9px rgba(0,0,0,0.8);
+      font-size: 8px;
+    }
+
+    .card-actions button:disabled {
+      opacity: 0.4;
+      cursor: default;
+      box-shadow: none;
+      border-style: dashed;
+    }
+
+    .card-actions button:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .log-panel {
+      max-height: 90px;
+      overflow-y: auto;
+      padding-right: 2px;
+      margin-top: 2px;
+      font-size: 9px;
+    }
+
+    .log-entry {
+      margin-bottom: 1px;
+      color: var(--muted);
+    }
+
+    .log-entry span.time {
+      color: #6b7280;
+      margin-right: 3px;
+    }
+
+    .log-entry.positive { color: var(--success); }
+    .log-entry.negative { color: var(--danger); }
+
+    .log-entry strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .log-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .log-panel::-webkit-scrollbar-thumb {
+      background: #1f2937;
+      border-radius: 999px;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .hint {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .hint strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .footer {
+      padding: 4px 8px 6px;
+      font-size: 9px;
+      color: var(--muted);
+      border-top: 1px solid #020617;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .footer .hotkeys {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .footer .hotkeys span {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 1px 5px;
+      background: rgba(0,0,0,0.9);
+    }
+
+    .keycap {
+      padding: 1px 3px;
+      border-radius: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 8px;
+      background: rgba(0,0,0,0.95);
+      color: #e5e7eb;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-backdrop.active { display: flex; }
+
+    .modal {
+      background: rgba(0,0,0,0.9);
+      border-radius: 9px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+      padding: 8px 10px 8px;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      font-size: 10px;
+    }
+
+    .modal h2 {
+      margin: 0 0 3px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .modal p {
+      margin: 2px 0;
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .modal-actions {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 5px;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(0,0,0,0.95);
+      color: var(--muted);
+      font-size: 9px;
+      padding: 1px 5px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .difficulty-select {
+      display: flex;
+      gap: 3px;
+      margin-top: 3px;
+      flex-wrap: wrap;
+    }
+
+    .difficulty-select button {
+      flex: 1;
+      min-width: 0;
+      padding: 3px 5px;
+      font-size: 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(0,0,0,0.95);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      white-space: nowrap;
+    }
+
+    .difficulty-select button.active {
+      background: radial-gradient(circle at top left, var(--accent-soft), rgba(0,0,0,0.98));
+      color: var(--accent);
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    .theme-select {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3px;
+      margin-top: 3px;
+    }
+
+    .theme-select button {
+      padding: 3px 5px;
+      font-size: 9px;
+      border-radius: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(0,0,0,0.95);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      text-align: left;
+    }
+
+    .theme-select button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 9px rgba(0,0,0,0.8);
+    }
+
+    .small-label {
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .small-label strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .warning-text {
+      font-size: 9px;
+      color: var(--danger);
+      margin-top: 2px;
+    }
+
+    .save-indicator {
+      font-size: 9px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .save-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 7px rgba(34, 197, 94, 0.9);
+    }
+
+    .save-dot.dirty {
+      background: #f97373;
+      box-shadow: 0 0 7px rgba(248, 113, 113, 0.9);
+    }
+
+    /* MAIN MENU OVERLAY */
+    #mainMenuOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(0,0,0,0.9), rgba(0,0,0,0.98));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+    }
+
+    #mainMenu {
+      max-width: 460px;
+      width: 100%;
+      background: rgba(0,0,0,0.9);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 22px 46px rgba(0,0,0,0.95);
+      padding: 10px 12px 9px;
+      font-size: 10px;
+    }
+
+    #mainMenu h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    #mainMenu .subtitle {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    #mainMenu .menu-buttons {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    #mainMenu .menu-buttons .btn {
+      justify-content: center;
+    }
+
+    #mainMenu .section {
+      margin-top: 7px;
+      padding-top: 5px;
+      border-top: 1px solid rgba(31,41,55,0.9);
+    }
+
+    #mainMenu .section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    #gameRoot.hidden {
+      visibility: hidden;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 1px 5px;
+      border-radius: 999px;
+      font-size: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+      background: rgba(0,0,0,0.9);
+    }
+
+    .badge-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body class="theme-carbon">
+<div id="app">
+  <!-- MAIN MENU OVERLAY -->
+  <div id="mainMenuOverlay">
+    <div id="mainMenu">
+      <h1>Business Tycoon++</h1>
+      <div class="subtitle">From street carts to skyscrapers. Carbon fiber edition.</div>
+
+      <div class="menu-buttons">
+        <button class="btn btn-primary" id="menuPlayBtn">Start New Game</button>
+        <button class="btn" id="menuLoadBtn">Load Game</button>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Difficulty</div>
+        <div class="difficulty-select" id="menuDifficultySelect">
+          <button data-difficulty="easy" class="active">Easy</button>
+          <button data-difficulty="normal">Normal</button>
+          <button data-difficulty="hard">Hard</button>
+        </div>
+        <p class="small-label">
+          <strong>Easy:</strong> Chill growth, no nasty events.  
+          <strong>Normal:</strong> Random setbacks.  
+          <strong>Hard:</strong> Multi‑phase days + setbacks + tighter cash.
+        </p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Theme</div>
+        <div class="theme-select" id="themeSelect">
+          <button data-theme="carbon" class="active">Carbon Fiber</button>
+          <button data-theme="neon">Neon Blue</button>
+          <button data-theme="gold">Gold Executive</button>
+          <button data-theme="dark">Dark Mode</button>
+          <button data-theme="light">Light Mode</button>
+          <button data-theme="terminal">Retro Terminal</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Tips</div>
+        <p class="small-label">
+          Buy a <strong>Lemonade Stand</strong>, press <span class="keycap">Space</span> to move through
+          <strong>Morning → Afternoon → Evening</strong>, then the day resolves.  
+          On Normal/Hard, expect random bad news.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME ROOT -->
+  <div id="gameRoot" class="hidden">
+    <header>
+      <div class="title">
+        <div class="logo">BT</div>
+        <div>
+          <h1>Business Tycoon++</h1>
+          <div class="subtitle">Leveraged growth, random chaos, and real estate.</div>
+        </div>
+      </div>
+      <div class="top-right">
+        <div class="pill">
+          <span class="key">Space</span> advance phase
+        </div>
+        <button class="btn" id="openLoansBtn">Loans</button>
+        <button class="btn" id="openSettingsBtn">Settings</button>
+        <button class="btn btn-primary" id="newGameBtn">Main Menu</button>
+      </div>
+    </header>
+
+    <main>
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>Company</h3>
+          <div class="stat-row">
+            <span class="stat-label">Name</span>
+            <span class="stat-value" id="companyName">Unnamed Corp</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">CEO</span>
+            <span class="stat-value" id="ceoName">You</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Difficulty</span>
+            <span class="stat-value" id="difficultyLabel">Normal</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Wealth</h3>
+          <div class="money-display">
+            <span class="currency">$</span>
+            <span id="moneyDisplay">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Net worth</span>
+            <span class="stat-value" id="netWorthDisplay">$0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Daily profit</span>
+            <span class="stat-value positive" id="dailyProfitDisplay">$0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Day</span>
+            <span class="stat-value" id="dayDisplay">1</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Phase</span>
+            <span class="stat-value" id="phaseDisplay">Morning</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Reputation</h3>
+          <div class="stat-row">
+            <span class="stat-label">Level</span>
+            <span class="stat-value" id="levelDisplay">1</span>
+          </div>
+          <div class="xp-bar-container">
+            <div class="xp-bar" id="xpBar"></div>
+            <div class="xp-label" id="xpLabel">0 / 100 XP</div>
+          </div>
+          <div class="stat-row" style="margin-top: 2px;">
+            <span class="stat-label">Brand</span>
+            <span class="stat-value" id="brandDisplay">Unknown</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Overview</h3>
+          <div class="stat-row">
+            <span class="stat-label">Businesses</span>
+            <span class="stat-value" id="businessCount">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Employees</span>
+            <span class="stat-value" id="employeeCount">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Research</span>
+            <span class="stat-value" id="researchCount">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Market mood</span>
+            <span class="stat-value" id="marketMood">Stable</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Debt</span>
+            <span class="stat-value" id="debtDisplay">$0</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Menus</h3>
+          <div class="menu">
+            <button class="active" data-tab="cityTab">City</button>
+            <button data-tab="researchTab">Research</button>
+            <button data-tab="staffTab">Staff</button>
+            <button data-tab="marketTab">Market</button>
+          </div>
+          <div class="hint">
+            <strong>Tip:</strong> Hard mode: three phases per day. Normal/Hard: random bad events. Easy: pure sandbox.
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Save</h3>
+          <div class="stat-row">
+            <span class="stat-label">Autosave</span>
+            <span class="stat-value" id="autosaveStatus">On</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Last save</span>
+            <span class="stat-value" id="lastSaveDisplay">Never</span>
+          </div>
+          <div class="save-indicator">
+            <span class="save-dot" id="saveDot"></span>
+            <span id="saveStatusText">Game saved</span>
+          </div>
+          <div class="card-actions" style="margin-top: 3px;">
+            <button id="saveBtn" class="primary">Save</button>
+            <button id="loadBtn">Load</button>
+          </div>
+        </div>
+      </aside>
+
+      <section class="main-panel">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>City & Operations</h2>
+              <div class="tagline">From carts to casinos to skyscrapers.</div>
+            </div>
+            <div class="badge">
+              <span class="badge-dot"></span>
+              <span id="dayPhaseLabel">Morning</span>
+            </div>
+          </div>
+          <div class="panel-content">
+            <div id="cityTab" class="tab-content active">
+              <div class="city-grid" id="businessGrid"></div>
+              <div class="hint">
+                <strong>Space</strong> cycles phases. At the end of Evening, the day resolves: income, costs, loans, and events.
+              </div>
+            </div>
+
+            <div id="researchTab" class="tab-content">
+              <div class="research-grid" id="researchGrid"></div>
+              <div class="hint">
+                Research stacks globally. Button text is compact so it never overflows.
+              </div>
+            </div>
+
+            <div id="staffTab" class="tab-content">
+              <div class="staff-grid" id="staffGrid"></div>
+              <div class="hint">
+                Staff specialize: finance, legal, tech, food, and real estate all get their own boosters.
+              </div>
+            </div>
+
+            <div id="marketTab" class="tab-content">
+              <div class="market-grid" id="marketGrid"></div>
+              <div class="hint">
+                Markets boom and crash. Real estate is slow but powerful; tech is volatile; food is steady.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Daily Log</h2>
+              <div class="tagline">Compact history of your empire’s moves and misfortunes.</div>
+            </div>
+            <div style="font-size:9px;color:var(--muted);">
+              <strong>Day</strong> <span id="dayDisplayLog">1</span> •
+              <strong>Cash flow</strong> <span id="cashFlowDisplay">$0</span>
+            </div>
+          </div>
+          <div class="panel-content">
+            <div class="log-panel" id="logPanel"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="footer">
+      <div>
+        Business Tycoon++ • Carbon Fiber default • Multi‑phase days, random events, real estate.
+      </div>
+      <div class="hotkeys">
+        <span><span class="keycap">Space</span> Next phase</span>
+        <span><span class="keycap">1‑4</span> Tabs</span>
+        <span><span class="keycap">S</span> Save</span>
+        <span><span class="keycap">L</span> Load</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOAN MODAL -->
+<div class="modal-backdrop" id="loanModal">
+  <div class="modal">
+    <button class="modal-close" data-close="loanModal">Esc</button>
+    <h2>Loans</h2>
+    <p>Borrow to grow faster—but every resolved day adds interest and expects payment.</p>
+
+    <div class="loan-grid">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Current Debt</div>
+            <div class="card-subtitle">Outstanding principal and daily interest.</div>
+          </div>
+          <div class="card-badge" id="loanStatusBadge">No debt</div>
+        </div>
+        <div class="card-main-stat">
+          $<span id="loanPrincipalDisplay">0</span>
+          <span class="unit">principal</span>
+        </div>
+        <div class="card-row">
+          <span>Daily interest</span>
+          <span><strong id="loanInterestRateDisplay">0%</strong></span>
+        </div>
+        <div class="card-row">
+          <span>Minimum payment</span>
+          <span><strong>$<span id="loanMinPaymentDisplay">0</span></strong> / day</span>
+        </div>
+        <div class="card-actions">
+          <button id="payMinLoanBtn" class="primary">Pay minimum</button>
+          <button id="payAllLoanBtn">Pay all</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Take New Loan</div>
+            <div class="card-subtitle">Choose an amount and terms.</div>
+          </div>
+          <div class="card-badge">Bank</div>
+        </div>
+        <div class="card-row">
+          <span>Amount</span>
+          <span><strong>$</strong></span>
+        </div>
+        <input id="loanAmountInput" type="number" min="0" step="100"
+               placeholder="e.g. 5000"
+               style="width:100%;padding:3px 5px;border-radius:6px;border:1px solid #1f2937;background:#020617;color:#e5e7eb;font-size:9px;margin-top:2px;">
+        <div class="card-row">
+          <span>Daily interest rate</span>
+          <span><strong id="loanNewRateLabel">3%</strong></span>
+        </div>
+        <div class="card-row">
+          <span>Estimated min payment</span>
+          <span><strong>$<span id="loanNewMinLabel">0</span></strong> / day</span>
+        </div>
+        <div class="card-actions">
+          <button id="takeLoanBtn" class="primary">Take loan</button>
+        </div>
+        <p class="warning-text" id="loanWarningText"></p>
+      </div>
+    </div>
+
+    <p class="small-label">
+      On <strong>Hard</strong>, running deep negative with high debt can trigger forced liquidation events.
+    </p>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-backdrop" id="settingsModal">
+  <div class="modal">
+    <button class="modal-close" data-close="settingsModal">Esc</button>
+    <h2>Settings</h2>
+    <p>Adjust theme and layout. Difficulty is set when starting a new game.</p>
+
+    <p class="small-label"><strong>Theme</strong></p>
+    <div class="theme-select" id="settingsThemeSelect">
+      <button data-theme="carbon">Carbon Fiber</button>
+      <button data-theme="neon">Neon Blue</button>
+      <button data-theme="gold">Gold Executive</button>
+      <button data-theme="dark">Dark Mode</button>
+      <button data-theme="light">Light Mode</button>
+      <button data-theme="terminal">Retro Terminal</button>
+    </div>
+
+    <p class="small-label" style="margin-top:5px;"><strong>Layout</strong></p>
+    <div class="card-actions">
+      <button id="toggleCondensedBtn" class="primary">Toggle condensed mode</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" data-close="settingsModal">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const BRAND_TITLES = [
+    "Unknown", "Local Name", "Regional Player", "National Brand",
+    "Household Name", "Global Powerhouse", "Legendary Empire"
+  ];
+
+  const PHASES = ["Morning", "Afternoon", "Evening"];
+
+  const DIFFICULTY_CONFIG = {
+    easy: {
+      label: "Easy",
+      startingMoney: 6000,
+      marketVolatility: 0.6,
+      bankruptcyThreshold: -8000,
+      loanRate: 0.02,
+      eventChance: 0
+    },
+    normal: {
+      label: "Normal",
+      startingMoney: 3000,
+      marketVolatility: 1.0,
+      bankruptcyThreshold: -3000,
+      loanRate: 0.03,
+      eventChance: 0.25
+    },
+    hard: {
+      label: "Hard",
+      startingMoney: 1500,
+      marketVolatility: 1.5,
+      bankruptcyThreshold: -1500,
+      loanRate: 0.04,
+      eventChance: 0.4
+    }
+  };
+
+  // ~40 businesses across tiers
+  const BUSINESS_TYPES = [
+    // Starter street tier
+    { id: "lemonade", name: "Lemonade Stand", description: "Your humble beginning.", baseCost: 100, baseIncome: 25, baseUpkeep: 5, sector: "Food & Beverage", icon: "🥤", unlockLevel: 1 },
+    { id: "hotdog", name: "Hot Dog Cart", description: "Street food with solid margins.", baseCost: 200, baseIncome: 45, baseUpkeep: 10, sector: "Food & Beverage", icon: "🌭", unlockLevel: 1 },
+    { id: "icecream", name: "Ice Cream Stall", description: "Seasonal but sweet profits.", baseCost: 300, baseIncome: 60, baseUpkeep: 15, sector: "Food & Beverage", icon: "🍦", unlockLevel: 1 },
+    { id: "streetcoffee", name: "Street Coffee Vendor", description: "Caffeine on the go.", baseCost: 350, baseIncome: 70, baseUpkeep: 18, sector: "Food & Beverage", icon: "☕", unlockLevel: 1 },
+    { id: "foodTruck", name: "Food Truck", description: "Mobile food with higher margins.", baseCost: 800, baseIncome: 140, baseUpkeep: 40, sector: "Food & Beverage", icon: "🚚", unlockLevel: 2 },
+
+    // Small business tier
+    { id: "bakery", name: "Local Bakery", description: "Fresh bread, steady customers.", baseCost: 1500, baseIncome: 230, baseUpkeep: 70, sector: "Hospitality", icon: "🥐", unlockLevel: 2 },
+    { id: "barber", name: "Barber Shop", description: "Haircuts never go out of style.", baseCost: 1200, baseIncome: 190, baseUpkeep: 55, sector: "Services", icon: "💈", unlockLevel: 2 },
+    { id: "thrift", name: "Thrift Store", description: "Low cost inventory, niche finds.", baseCost: 1300, baseIncome: 200, baseUpkeep: 60, sector: "Retail", icon: "🧥", unlockLevel: 2 },
+    { id: "smallgym", name: "Small Gym", description: "Membership‑based revenue.", baseCost: 2000, baseIncome: 320, baseUpkeep: 110, sector: "Health & Fitness", icon: "🏋️", unlockLevel: 3 },
+    { id: "carwash", name: "Car Wash", description: "Water, soap, and recurring customers.", baseCost: 1800, baseIncome: 290, baseUpkeep: 95, sector: "Services", icon: "🚗", unlockLevel: 3 },
+
+    // Mid‑tier
+    { id: "restaurant", name: "Family Restaurant", description: "Sit‑down dining with higher tickets.", baseCost: 3500, baseIncome: 520, baseUpkeep: 190, sector: "Hospitality", icon: "🍽️", unlockLevel: 3 },
+    { id: "electronics", name: "Electronics Store", description: "Gadgets with decent margins.", baseCost: 4200, baseIncome: 640, baseUpkeep: 210, sector: "Retail", icon: "📱", unlockLevel: 4 },
+    { id: "clothing", name: "Clothing Boutique", description: "Trendy fashion, variable demand.", baseCost: 3800, baseIncome: 580, baseUpkeep: 200, sector: "Retail", icon: "👗", unlockLevel: 4 },
+    { id: "autorepair", name: "Auto Repair Shop", description: "Cars always need fixing.", baseCost: 4000, baseIncome: 620, baseUpkeep: 210, sector: "Services", icon: "🔧", unlockLevel: 4 },
+    { id: "minimart", name: "Mini‑Mart", description: "Convenience store with steady flow.", baseCost: 3600, baseIncome: 560, baseUpkeep: 190, sector: "Retail", icon: "🏪", unlockLevel: 4 },
+
+    // Corporate tier
+    { id: "supermarket", name: "Supermarket", description: "High volume, thin margins.", baseCost: 8000, baseIncome: 1400, baseUpkeep: 520, sector: "Retail", icon: "🛒", unlockLevel: 5 },
+    { id: "warehouse", name: "Logistics Warehouse", description: "Storage and distribution hub.", baseCost: 9000, baseIncome: 1550, baseUpkeep: 580, sector: "Logistics", icon: "📦", unlockLevel: 5 },
+    { id: "software", name: "Software Company", description: "Scalable digital products.", baseCost: 10000, baseIncome: 1900, baseUpkeep: 650, sector: "Technology", icon: "💻", unlockLevel: 5 },
+    { id: "factory", name: "Manufacturing Plant", description: "High capex, strong output.", baseCost: 11000, baseIncome: 2100, baseUpkeep: 780, sector: "Industry", icon: "🏭", unlockLevel: 6 },
+    { id: "hotel", name: "City Hotel", description: "Rooms, conferences, and events.", baseCost: 12000, baseIncome: 2200, baseUpkeep: 820, sector: "Hospitality", icon: "🏨", unlockLevel: 6 },
+
+    // High‑end / late game
+    { id: "casino", name: "Casino", description: "The house usually wins.", baseCost: 20000, baseIncome: 4200, baseUpkeep: 1600, sector: "Entertainment", icon: "🎰", unlockLevel: 7 },
+    { id: "airline", name: "Regional Airline", description: "High risk, high complexity.", baseCost: 26000, baseIncome: 5200, baseUpkeep: 2200, sector: "Transport", icon: "✈️", unlockLevel: 8 },
+    { id: "techmega", name: "Tech Megacorp", description: "Global platforms and data.", baseCost: 30000, baseIncome: 6200, baseUpkeep: 2600, sector: "Technology", icon: "🛰️", unlockLevel: 8 },
+    { id: "luxresort", name: "Luxury Resort", description: "High‑end guests, seasonal demand.", baseCost: 28000, baseIncome: 5800, baseUpkeep: 2400, sector: "Hospitality", icon: "🏝️", unlockLevel: 8 },
+    { id: "pharma", name: "Pharmaceutical Lab", description: "R&D heavy, big payoffs.", baseCost: 32000, baseIncome: 6500, baseUpkeep: 2700, sector: "Healthcare", icon: "💊", unlockLevel: 9 },
+
+    // Real estate tier
+    { id: "apartment", name: "Apartment Complex", description: "Rent checks every month.", baseCost: 15000, baseIncome: 2600, baseUpkeep: 900, sector: "Real Estate", icon: "🏘️", unlockLevel: 6 },
+    { id: "office", name: "Office Building", description: "Corporate tenants, long leases.", baseCost: 20000, baseIncome: 3400, baseUpkeep: 1200, sector: "Real Estate", icon: "🏢", unlockLevel: 7 },
+    { id: "mall", name: "Shopping Mall", description: "Anchor stores and foot traffic.", baseCost: 26000, baseIncome: 4300, baseUpkeep: 1600, sector: "Real Estate", icon: "🏬", unlockLevel: 8 },
+    { id: "industrialpark", name: "Industrial Park", description: "Warehouses and factories.", baseCost: 28000, baseIncome: 4500, baseUpkeep: 1700, sector: "Real Estate", icon: "🏗️", unlockLevel: 8 },
+    { id: "skyscraper", name: "Skyscraper", description: "Iconic skyline asset.", baseCost: 40000, baseIncome: 8000, baseUpkeep: 3000, sector: "Real Estate", icon: "🌆", unlockLevel: 9 },
+
+    // Online / digital
+    { id: "ecommerce", name: "Online Store", description: "Scalable e‑commerce platform.", baseCost: 6000, baseIncome: 900, baseUpkeep: 260, sector: "Technology", icon: "🛍️", unlockLevel: 4 },
+    { id: "subscription", name: "Subscription Service", description: "Recurring digital revenue.", baseCost: 9000, baseIncome: 1500, baseUpkeep: 450, sector: "Technology", icon: "📡", unlockLevel: 5 },
+    { id: "streaming", name: "Streaming Platform", description: "Content and bandwidth.", baseCost: 14000, baseIncome: 2600, baseUpkeep: 900, sector: "Technology", icon: "📺", unlockLevel: 6 },
+
+    // Misc / flavor
+    { id: "farm", name: "Organic Farm", description: "Slow but stable yields.", baseCost: 5000, baseIncome: 700, baseUpkeep: 260, sector: "Agriculture", icon: "🌾", unlockLevel: 4 },
+    { id: "solar", name: "Solar Farm", description: "Green energy contracts.", baseCost: 16000, baseIncome: 2800, baseUpkeep: 950, sector: "Energy", icon: "🔆", unlockLevel: 7 },
+    { id: "wind", name: "Wind Turbines", description: "Wind‑powered revenue.", baseCost: 18000, baseIncome: 3100, baseUpkeep: 1050, sector: "Energy", icon: "🌬️", unlockLevel: 7 },
+    { id: "microbrew", name: "Microbrewery", description: "Craft beer, loyal fans.", baseCost: 7000, baseIncome: 1100, baseUpkeep: 380, sector: "Food & Beverage", icon: "🍺", unlockLevel: 5 },
+    { id: "arcade", name: "Retro Arcade", description: "Nostalgia‑driven fun.", baseCost: 5500, baseIncome: 850, baseUpkeep: 320, sector: "Entertainment", icon: "🕹️", unlockLevel: 4 }
+  ];
+
+  const RESEARCH_ITEMS = [
+    { id: "marketing1", name: "Basic Marketing", description: "Increase revenue of all businesses by 10%.", cost: 1500, effectType: "globalIncomeMultiplier", effectValue: 0.10, maxLevel: 1, category: "Marketing" },
+    { id: "marketing2", name: "Advanced Marketing", description: "Increase revenue of all businesses by 15%.", cost: 5000, effectType: "globalIncomeMultiplier", effectValue: 0.15, maxLevel: 1, category: "Marketing" },
+    { id: "efficiency1", name: "Lean Operations", description: "Reduce upkeep costs by 10%.", cost: 2000, effectType: "globalUpkeepMultiplier", effectValue: -0.10, maxLevel: 1, category: "Operations" },
+    { id: "efficiency2", name: "Automation Systems", description: "Reduce upkeep costs by another 10%.", cost: 6000, effectType: "globalUpkeepMultiplier", effectValue: -0.10, maxLevel: 1, category: "Operations" },
+    { id: "analytics", name: "Customer Analytics", description: "Increase daily XP gain by 25%.", cost: 4000, effectType: "xpMultiplier", effectValue: 0.25, maxLevel: 1, category: "Data" },
+    { id: "branding", name: "Corporate Branding", description: "Increase brand level progression speed.", cost: 7000, effectType: "xpMultiplier", effectValue: 0.35, maxLevel: 1, category: "Brand" },
+    { id: "realestate", name: "Real Estate Management", description: "Increase income of Real Estate by 20%.", cost: 8000, effectType: "sectorIncomeRealEstate", effectValue: 0.20, maxLevel: 1, category: "Real Estate" },
+    { id: "techboost", name: "Tech Innovation", description: "Increase income of Technology by 20%.", cost: 8000, effectType: "sectorIncomeTechnology", effectValue: 0.20, maxLevel: 1, category: "Technology" },
+    { id: "riskhedge", name: "Risk Hedging", description: "Reduce impact of negative events.", cost: 9000, effectType: "eventMitigation", effectValue: 0.3, maxLevel: 1, category: "Finance" }
+  ];
+
+  const STAFF_ROLES = [
+    { id: "assistant", name: "Operations Assistant", description: "Occasionally auto‑advance a phase.", salary: 120, effectType: "autoAdvance", effectValue: 0.25, maxCount: 3 },
+    { id: "manager", name: "Regional Manager", description: "Boosts income of all businesses by 5%.", salary: 260, effectType: "globalIncomeMultiplier", effectValue: 0.05, maxCount: 4 },
+    { id: "accountant", name: "Accountant", description: "Reduces effective loan interest.", salary: 220, effectType: "loanRateReduction", effectValue: 0.005, maxCount: 3 },
+    { id: "lawyer", name: "Corporate Lawyer", description: "Reduces penalties from bad events.", salary: 280, effectType: "eventMitigation", effectValue: 0.1, maxCount: 3 },
+    { id: "engineer", name: "Systems Engineer", description: "Boosts Technology sector income.", salary: 300, effectType: "sectorIncomeTechnology", effectValue: 0.05, maxCount: 4 },
+    { id: "chef", name: "Executive Chef", description: "Boosts Food & Beverage income.", salary: 260, effectType: "sectorIncomeFood", effectValue: 0.05, maxCount: 4 },
+    { id: "reManager", name: "Real Estate Manager", description: "Boosts Real Estate income.", salary: 320, effectType: "sectorIncomeRealEstate", effectValue: 0.06, maxCount: 4 },
+    { id: "cfo", name: "CFO", description: "Global income boost.", salary: 500, effectType: "globalIncomeMultiplier", effectValue: 0.07, maxCount: 2 },
+    { id: "coo", name: "COO", description: "Global upkeep reduction.", salary: 500, effectType: "globalUpkeepMultiplier", effectValue: -0.07, maxCount: 2 }
+  ];
+
+  const STORAGE_KEY = "businessTycoonPlusPlus_v1";
+
+  const el = id => document.getElementById(id);
+
+  const state = {
+    companyName: "Unnamed Corp",
+    ceoName: "You",
+    difficulty: "easy",
+    day: 1,
+    phaseIndex: 0,
+    money: 0,
+    netWorth: 0,
+    xp: 0,
+    level: 1,
+    businesses: [],
+    research: {},
+    staff: {},
+    marketMood: "Stable",
+    lastSave: null,
+    autosave: true,
+    dirty: false,
+    stats: {
+      totalIncome: 0,
+      totalUpkeep: 0,
+      lastCashFlow: 0
+    },
+    loans: {
+      principal: 0,
+      dailyRate: 0,
+      minPayment: 0
+    },
+    condensed: true,
+    theme: "carbon"
+  };
+
+  function formatMoney(value) {
+    const sign = value < 0 ? "-" : "";
+    const abs = Math.abs(value);
+    let formatted;
+    if (abs >= 1_000_000) formatted = (abs / 1_000_000).toFixed(2) + "M";
+    else if (abs >= 1_000) formatted = (abs / 1_000).toFixed(1) + "K";
+    else formatted = abs.toFixed(0);
+    return sign + formatted;
+  }
+
+  function randomCompanyName() {
+    const prefixes = ["Aurora", "Nova", "Vertex", "Summit", "Pioneer", "Quantum", "Evergreen", "Atlas", "Carbon", "Skyline"];
+    const suffixes = ["Ventures", "Holdings", "Capital", "Industries", "Labs", "Group", "Partners", "Realty", "Global"];
+    return prefixes[Math.floor(Math.random() * prefixes.length)] + " " +
+           suffixes[Math.floor(Math.random() * suffixes.length)];
+  }
+
+  function markDirty() {
+    state.dirty = true;
+    el("saveDot").classList.add("dirty");
+    el("saveStatusText").textContent = "Unsaved changes";
+  }
+
+  function computeBrandTitle(level) {
+    const index = Math.min(BRAND_TITLES.length - 1, Math.floor((level - 1) / 2));
+    return BRAND_TITLES[index];
+  }
+
+  function computeResearchEffects() {
+    let incomeMultiplier = 1;
+    let upkeepMultiplier = 1;
+    let xpMultiplier = 1;
+    let sectorIncome = {
+      "Real Estate": 1,
+      "Technology": 1,
+      "Food & Beverage": 1
+    };
+    let eventMitigation = 0;
+    let loanRateReduction = 0;
+
+    Object.entries(state.research).forEach(([id, level]) => {
+      if (!level) return;
+      const item = RESEARCH_ITEMS.find(r => r.id === id);
+      if (!item) return;
+      const val = item.effectValue * level;
+      if (item.effectType === "globalIncomeMultiplier") incomeMultiplier += val;
+      if (item.effectType === "globalUpkeepMultiplier") upkeepMultiplier += val;
+      if (item.effectType === "xpMultiplier") xpMultiplier += val;
+      if (item.effectType === "sectorIncomeRealEstate") sectorIncome["Real Estate"] += val;
+      if (item.effectType === "sectorIncomeTechnology") sectorIncome["Technology"] += val;
+      if (item.effectType === "eventMitigation") eventMitigation += val;
+    });
+
+    Object.entries(state.staff).forEach(([id, count]) => {
+      if (!count) return;
+      const role = STAFF_ROLES.find(r => r.id === id);
+      if (!role) return;
+      const total = role.effectValue * count;
+      if (role.effectType === "globalIncomeMultiplier") incomeMultiplier += total;
+      if (role.effectType === "globalUpkeepMultiplier") upkeepMultiplier += total;
+      if (role.effectType === "sectorIncomeRealEstate") sectorIncome["Real Estate"] += total;
+      if (role.effectType === "sectorIncomeTechnology") sectorIncome["Technology"] += total;
+      if (role.effectType === "sectorIncomeFood") sectorIncome["Food & Beverage"] += total;
+      if (role.effectType === "eventMitigation") eventMitigation += total;
+      if (role.effectType === "loanRateReduction") loanRateReduction += total;
+    });
+
+    return { incomeMultiplier, upkeepMultiplier, xpMultiplier, sectorIncome, eventMitigation, loanRateReduction };
+  }
+
+  function computeDailyEconomy() {
+    const effects = computeResearchEffects();
+    let totalIncome = 0;
+    let totalUpkeep = 0;
+
+    state.businesses.forEach(biz => {
+      const type = BUSINESS_TYPES.find(t => t.id === biz.typeId);
+      if (!type) return;
+      const sectorMult = effects.sectorIncome[type.sector] || 1;
+      const baseIncome = biz.baseIncome * biz.level * effects.incomeMultiplier * sectorMult;
+      const baseUpkeep = biz.baseUpkeep * biz.level * effects.upkeepMultiplier;
+      totalIncome += baseIncome;
+      totalUpkeep += baseUpkeep;
+    });
+
+    const staffSalary = Object.entries(state.staff).reduce((sum, [id, count]) => {
+      const role = STAFF_ROLES.find(r => r.id === id);
+      if (!role) return sum;
+      return sum + role.salary * count;
+    }, 0);
+
+    totalUpkeep += staffSalary;
+
+    let loanInterest = 0;
+    if (state.loans.principal > 0 && state.loans.dailyRate > 0) {
+      const effects = computeResearchEffects();
+      const effectiveRate = Math.max(0, state.loans.dailyRate - effects.loanRateReduction);
+      loanInterest = state.loans.principal * effectiveRate;
+      totalUpkeep += loanInterest + state.loans.minPayment;
+    }
+
+    const cashFlow = totalIncome - totalUpkeep;
+    return { totalIncome, totalUpkeep, cashFlow, loanInterest, staffSalary };
+  }
+
+  function gainXP(amount) {
+    const effects = computeResearchEffects();
+    const total = amount * effects.xpMultiplier;
+    state.xp += total;
+    let xpForNext = 100 + (state.level - 1) * 40;
+    while (state.xp >= xpForNext) {
+      state.xp -= xpForNext;
+      state.level++;
+      addLog("Level up", "Your reputation has grown. New opportunities unlocked.", "positive");
+      xpForNext = 100 + (state.level - 1) * 40;
+    }
+  }
+
+  function addLog(title, message, type = "neutral") {
+    const logPanel = el("logPanel");
+    const entry = document.createElement("div");
+    entry.className = "log-entry" + (type === "positive" ? " positive" : type === "negative" ? " negative" : "");
+    const time = "[" + String(state.day).padStart(3, "0") + "]";
+    entry.innerHTML = `<span class="time">${time}</span><strong>${title}</strong> — ${message}`;
+    logPanel.insertBefore(entry, logPanel.firstChild);
+    while (logPanel.children.length > 80) logPanel.removeChild(logPanel.lastChild);
+  }
+
+  function updateNetWorth() {
+    const businessValue = state.businesses.reduce((sum, biz) => {
+      const type = BUSINESS_TYPES.find(t => t.id === biz.typeId);
+      if (!type) return sum;
+      return sum + type.baseCost * (0.7 + 0.3 * biz.level);
+    }, 0);
+
+    const researchValue = Object.entries(state.research).reduce((sum, [id, level]) => {
+      const item = RESEARCH_ITEMS.find(r => r.id === id);
+      if (!item) return sum;
+      return sum + item.cost * level * 0.6;
+    }, 0);
+
+    const staffValue = Object.entries(state.staff).reduce((sum, [id, count]) => {
+      const role = STAFF_ROLES.find(r => r.id === id);
+      if (!role) return sum;
+      return sum + role.salary * count * 10;
+    }, 0);
+
+    state.netWorth = state.money + businessValue + researchValue + staffValue - state.loans.principal;
+  }
+
+  function updateLoanUI() {
+    el("loanPrincipalDisplay").textContent = formatMoney(state.loans.principal);
+    el("loanInterestRateDisplay").textContent = (state.loans.dailyRate * 100).toFixed(1) + "%";
+    el("loanMinPaymentDisplay").textContent = formatMoney(state.loans.minPayment);
+    el("debtDisplay").textContent = "$" + formatMoney(state.loans.principal);
+
+    const badge = el("loanStatusBadge");
+    if (state.loans.principal <= 0) {
+      badge.textContent = "No debt";
+    } else {
+      badge.textContent = "Active loan";
+    }
+
+    el("payMinLoanBtn").disabled = state.loans.principal <= 0 || state.money <= 0;
+    el("payAllLoanBtn").disabled = state.loans.principal <= 0 || state.money <= 0;
+
+    const diffCfg = DIFFICULTY_CONFIG[state.difficulty];
+    const rate = diffCfg.loanRate;
+    const amount = parseFloat(el("loanAmountInput").value || "0");
+    const minPayment = amount > 0 ? Math.max(50, amount * 0.05) : 0;
+    el("loanNewRateLabel").textContent = (rate * 100).toFixed(1) + "%";
+    el("loanNewMinLabel").textContent = formatMoney(minPayment);
+
+    const warn = el("loanWarningText");
+    if (state.difficulty === "hard") {
+      warn.textContent = "Hard mode: deep negative cash with high debt can trigger forced liquidation.";
+    } else if (state.difficulty === "normal") {
+      warn.textContent = "Normal mode: random setbacks can make loans riskier.";
+    } else {
+      warn.textContent = "";
+    }
+  }
+
+  function applyTheme(theme) {
+    state.theme = theme;
+    document.body.className = "theme-" + theme;
+    document.querySelectorAll("#themeSelect button, #settingsThemeSelect button").forEach(btn => {
+      btn.classList.toggle("active", btn.getAttribute("data-theme") === theme);
+    });
+  }
+
+  function updatePhaseUI() {
+    const phaseName = PHASES[state.phaseIndex];
+    el("phaseDisplay").textContent = phaseName;
+    el("dayPhaseLabel").textContent = phaseName;
+  }
+
+  function updateUI() {
+    el("companyName").textContent = state.companyName;
+    el("ceoName").textContent = state.ceoName;
+    el("difficultyLabel").textContent = DIFFICULTY_CONFIG[state.difficulty].label;
+
+    el("moneyDisplay").textContent = formatMoney(state.money);
+    el("netWorthDisplay").textContent = "$" + formatMoney(state.netWorth);
+    el("dayDisplay").textContent = state.day;
+    el("dayDisplayLog").textContent = state.day;
+
+    const brandTitle = computeBrandTitle(state.level);
+    el("brandDisplay").textContent = brandTitle;
+    el("levelDisplay").textContent = state.level;
+
+    const xpForNext = 100 + (state.level - 1) * 40;
+    const xpPercent = Math.min(100, (state.xp / xpForNext) * 100);
+    el("xpBar").style.width = xpPercent + "%";
+    el("xpLabel").textContent = Math.floor(state.xp) + " / " + xpForNext + " XP";
+
+    const economy = computeDailyEconomy();
+    state.stats.totalIncome = economy.totalIncome;
+    state.stats.totalUpkeep = economy.totalUpkeep;
+
+    el("dailyProfitDisplay").textContent = "$" + formatMoney(economy.cashFlow);
+    el("dailyProfitDisplay").className = "stat-value " + (economy.cashFlow >= 0 ? "positive" : "negative");
+    el("cashFlowDisplay").textContent = "$" + formatMoney(state.stats.lastCashFlow);
+
+    updatePhaseUI();
+
+    el("businessCount").textContent = state.businesses.length;
+    const employeeCount = Object.values(state.staff).reduce((a, b) => a + b, 0);
+    el("employeeCount").textContent = employeeCount;
+    const researchCount = Object.values(state.research).filter(v => v > 0).length;
+    el("researchCount").textContent = researchCount;
+
+    updateLoanUI();
+    renderBusinesses();
+    renderResearch();
+    renderStaff();
+    renderMarket();
+  }
+
+  function renderBusinesses() {
+    const grid = el("businessGrid");
+    grid.innerHTML = "";
+    const effects = computeResearchEffects();
+
+    BUSINESS_TYPES.forEach(type => {
+      const owned = state.businesses.filter(b => b.typeId === type.id).length;
+      const unlocked = state.level >= type.unlockLevel;
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      const title = document.createElement("div");
+      title.innerHTML = `<div class="card-title">${type.icon} ${type.name}</div><div class="card-subtitle">${type.description}</div>`;
+      const badge = document.createElement("div");
+      badge.className = "card-badge";
+      badge.textContent = unlocked ? (owned > 0 ? owned + " owned" : "Unlocked") : "Unlocks at level " + type.unlockLevel;
+      header.appendChild(title);
+      header.appendChild(badge);
+
+      const mainStat = document.createElement("div");
+      mainStat.className = "card-main-stat";
+      const sectorMult = effects.sectorIncome[type.sector] || 1;
+      const baseIncome = type.baseIncome * effects.incomeMultiplier * sectorMult;
+      mainStat.innerHTML = `$${formatMoney(baseIncome)} <span class="unit">/ day</span>`;
+
+      const row1 = document.createElement("div");
+      row1.className = "card-row";
+      const baseUpkeep = type.baseUpkeep * effects.upkeepMultiplier;
+      row1.innerHTML = `<span>Upkeep</span><span><strong>$${formatMoney(baseUpkeep)}</strong> / day</span>`;
+
+      const row2 = document.createElement("div");
+      row2.className = "card-row";
+      row2.innerHTML = `<span>Sector</span><span>${type.sector}</span>`;
+
+      const row3 = document.createElement("div");
+      row3.className = "card-row";
+      row3.innerHTML = `<span>Purchase cost</span><span><strong>$${formatMoney(type.baseCost)}</strong></span>`;
+
+      const actions = document.createElement("div");
+      actions.className = "card-actions";
+
+      const buyBtn = document.createElement("button");
+      buyBtn.textContent = owned > 0 ? "Buy another" : "Buy";
+      buyBtn.classList.add("primary");
+      buyBtn.disabled = !unlocked || state.money < type.baseCost;
+      buyBtn.addEventListener("click", () => {
+        if (state.money < type.baseCost) return;
+        state.money -= type.baseCost;
+        state.businesses.push({
+          id: Date.now() + "_" + Math.random().toString(16).slice(2),
+          typeId: type.id,
+          name: type.name,
+          baseIncome: type.baseIncome,
+          baseUpkeep: type.baseUpkeep,
+          sector: type.sector,
+          level: 1
+        });
+        addLog("New business", `You purchased a ${type.name} for $${formatMoney(type.baseCost)}.`, "positive");
+        markDirty();
+        updateNetWorth();
+        updateUI();
+      });
+
+      const upgradeBtn = document.createElement("button");
+      upgradeBtn.textContent = "Upgrade all";
+      const upgradeCost = Math.floor(type.baseCost * 0.6 * (owned || 1));
+      upgradeBtn.disabled = owned === 0 || state.money < upgradeCost;
+      upgradeBtn.addEventListener("click", () => {
+        if (owned === 0 || state.money < upgradeCost) return;
+        state.money -= upgradeCost;
+        state.businesses.forEach(biz => {
+          if (biz.typeId === type.id) biz.level++;
+        });
+        addLog("Upgrades", `All ${type.name} locations upgraded for $${formatMoney(upgradeCost)}.`, "positive");
+        markDirty();
+        updateNetWorth();
+        updateUI();
+      });
+
+      actions.appendChild(buyBtn);
+      actions.appendChild(upgradeBtn);
+
+      card.appendChild(header);
+      card.appendChild(mainStat);
+      card.appendChild(row1);
+      card.appendChild(row2);
+      card.appendChild(row3);
+      card.appendChild(actions);
+
+      grid.appendChild(card);
+    });
+  }
+
+  function renderResearch() {
+    const grid = el("researchGrid");
+    grid.innerHTML = "";
+
+    RESEARCH_ITEMS.forEach(item => {
+      const level = state.research[item.id] || 0;
+      const maxed = level >= item.maxLevel;
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      const title = document.createElement("div");
+      title.innerHTML = `<div class="card-title">${item.name}</div><div class="card-subtitle">${item.description}</div>`;
+      const badge = document.createElement("div");
+      badge.className = "card-badge";
+      badge.textContent = item.category;
+      header.appendChild(title);
+      header.appendChild(badge);
+
+      const mainStat = document.createElement("div");
+      mainStat.className = "card-main-stat";
+      mainStat.innerHTML = `Lv. ${level} <span class="unit">/ ${item.maxLevel}</span>`;
+
+      const row1 = document.createElement("div");
+      row1.className = "card-row";
+      row1.innerHTML = `<span>Cost</span><span><strong>$${formatMoney(item.cost)}</strong></span>`;
+
+      const row2 = document.createElement("div");
+      row2.className = "card-row";
+      row2.innerHTML = `<span>Status</span><span>${maxed ? "Maxed" : "Available"}</span>`;
+
+      const actions = document.createElement("div");
+      actions.className = "card-actions";
+
+      const researchBtn = document.createElement("button");
+      researchBtn.textContent = maxed ? "Completed" : "Research";
+      researchBtn.classList.add("primary");
+      researchBtn.disabled = maxed || state.money < item.cost;
+      researchBtn.addEventListener("click", () => {
+        if (maxed || state.money < item.cost) return;
+        state.money -= item.cost;
+        state.research[item.id] = (state.research[item.id] || 0) + 1;
+        addLog("Research", `${item.name} completed.`, "positive");
+        gainXP(40);
+        markDirty();
+        updateNetWorth();
+        updateUI();
+      });
+
+      actions.appendChild(researchBtn);
+
+      card.appendChild(header);
+      card.appendChild(mainStat);
+      card.appendChild(row1);
+      card.appendChild(row2);
+      card.appendChild(actions);
+
+      grid.appendChild(card);
+    });
+  }
+
+  function renderStaff() {
+    const grid = el("staffGrid");
+    grid.innerHTML = "";
+
+    STAFF_ROLES.forEach(role => {
+      const count = state.staff[role.id] || 0;
+      const maxed = count >= role.maxCount;
+
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const header = document.createElement("div");
+      header.className = "card-header";
+      const title = document.createElement("div");
+      title.innerHTML = `<div class="card-title">${role.name}</div><div class="card-subtitle">${role.description}</div>`;
+      const badge = document.createElement("div");
+      badge.className = "card-badge";
+      badge.textContent = maxed ? "Max team" : "Staff role";
+      header.appendChild(title);
+      header.appendChild(badge);
+
+      const mainStat = document.createElement("div");
+      mainStat.className = "card-main-stat";
+      mainStat.innerHTML = `${count} <span class="unit">/ ${role.maxCount}</span>`;
+
+      const row1 = document.createElement("div");
+      row1.className = "card-row";
+      row1.innerHTML = `<span>Salary</span><span><strong>$${formatMoney(role.salary)}</strong> / day each</span>`;
+
+      const actions = document.createElement("div");
+      actions.className = "card-actions";
+
+      const hireBtn = document.createElement("button");
+      hireBtn.textContent = maxed ? "Team full" : "Hire";
+      hireBtn.classList.add("primary");
+      hireBtn.disabled = maxed || state.money < role.salary * 5;
+      hireBtn.addEventListener("click", () => {
+        if (maxed || state.money < role.salary * 5) return;
+        state.money -= role.salary * 5;
+        state.staff[role.id] = (state.staff[role.id] || 0) + 1;
+        addLog("New hire", `You hired a ${role.name}.`, "positive");
+        gainXP(20);
+        markDirty();
+        updateNetWorth();
+        updateUI();
+      });
+
+      const fireBtn = document.createElement("button");
+      fireBtn.textContent = "Fire";
+      fireBtn.disabled = count === 0;
+      fireBtn.addEventListener("click", () => {
+        if (count === 0) return;
+        state.staff[role.id] = count - 1;
+        addLog("Staff change", `You let go of a ${role.name}.`, "negative");
+        markDirty();
+        updateNetWorth();
+        updateUI();
+      });
+
+      actions.appendChild(hireBtn);
+      actions.appendChild(fireBtn);
+
+      card.appendChild(header);
+      card.appendChild(mainStat);
+      card.appendChild(row1);
+      card.appendChild(actions);
+
+      grid.appendChild(card);
+    });
+  }
+
+  function renderMarket() {
+    const grid = el("marketGrid");
+    grid.innerHTML = "";
+
+    const moodCard = document.createElement("div");
+    moodCard.className = "card";
+    moodCard.innerHTML = `
+      <div class="card-header">
+        <div>
+          <div class="card-title">Market Mood</div>
+          <div class="card-subtitle">Simple sentiment indicator.</div>
+        </div>
+        <div class="card-badge">${state.marketMood}</div>
+      </div>
+      <div class="card-main-stat">
+        ${state.marketMood}
+        <span class="unit">today</span>
+      </div>
+    `;
+    grid.appendChild(moodCard);
+
+    const sectors = {};
+    BUSINESS_TYPES.forEach(type => {
+      if (!sectors[type.sector]) sectors[type.sector] = { name: type.sector, businesses: 0, income: 0 };
+    });
+
+    const effects = computeResearchEffects();
+    state.businesses.forEach(biz => {
+      const type = BUSINESS_TYPES.find(t => t.id === biz.typeId);
+      if (!type) return;
+      if (!sectors[type.sector]) sectors[type.sector] = { name: type.sector, businesses: 0, income: 0 };
+      const sectorMult = effects.sectorIncome[type.sector] || 1;
+      const baseIncome = biz.baseIncome * biz.level * effects.incomeMultiplier * sectorMult;
+      sectors[type.sector].businesses++;
+      sectors[type.sector].income += baseIncome;
+    });
+
+    Object.values(sectors).forEach(sec => {
+      const card = document.createElement("div");
+      card.className = "card";
+      const header = document.createElement("div");
+      header.className = "card-header";
+      header.innerHTML = `
+        <div>
+          <div class="card-title">${sec.name}</div>
+          <div class="card-subtitle">Exposure and daily earnings.</div>
+        </div>
+        <div class="card-badge">${sec.businesses} businesses</div>
+      `;
+      card.appendChild(header);
+
+      const mainStat = document.createElement("div");
+      mainStat.className = "card-main-stat";
+      mainStat.innerHTML = `$${formatMoney(sec.income)} <span class="unit">/ day</span>`;
+      card.appendChild(mainStat);
+
+      grid.appendChild(card);
+    });
+  }
+
+  function triggerRandomEvent() {
+    const diffCfg = DIFFICULTY_CONFIG[state.difficulty];
+    if (diffCfg.eventChance <= 0) return;
+
+    if (Math.random() > diffCfg.eventChance) return;
+
+    const effects = computeResearchEffects();
+    const mitigation = Math.min(0.8, effects.eventMitigation || 0);
+    const roll = Math.random();
+    let severity = 1 - mitigation;
+
+    if (roll < 0.3) {
+      // Unexpected expense
+      const hit = Math.max(100, state.netWorth * 0.02 * severity);
+      state.money -= hit;
+      addLog("Unexpected expense", `A surprise bill cost you $${formatMoney(hit)}.`, "negative");
+    } else if (roll < 0.55) {
+      // Staff quits
+      const staffKeys = Object.keys(state.staff).filter(k => state.staff[k] > 0);
+      if (staffKeys.length > 0) {
+        const key = staffKeys[Math.floor(Math.random() * staffKeys.length)];
+        const role = STAFF_ROLES.find(r => r.id === key);
+        state.staff[key] -= 1;
+        addLog("Staff departure", `A ${role ? role.name : "staff member"} quit unexpectedly.`, "negative");
+      }
+    } else if (roll < 0.8) {
+      // Market downturn
+      state.marketMood = "Bearish";
+      addLog("Market downturn", "Sentiment turned bearish. Income may feel tighter.", "negative");
+    } else {
+      // Loan rate spike (if in debt)
+      if (state.loans.principal > 0) {
+        state.loans.dailyRate *= 1.15;
+        addLog("Rate hike", "Your lender increased your effective interest rate.", "negative");
+      }
+    }
+  }
+
+  function resolveDay() {
+    const economy = computeDailyEconomy();
+
+    if (state.loans.principal > 0 && state.loans.dailyRate > 0) {
+      const effects = computeResearchEffects();
+      const effectiveRate = Math.max(0, state.loans.dailyRate - effects.loanRateReduction);
+      const interest = state.loans.principal * effectiveRate;
+      state.loans.principal += interest;
+      const payment = Math.min(state.loans.minPayment, state.money);
+      state.money -= payment;
+      state.loans.principal = Math.max(0, state.loans.principal - payment);
+      if (interest > 0 || payment > 0) {
+        addLog("Loan update", `Interest $${formatMoney(interest)}, payment $${formatMoney(payment)}.`, "negative");
+      }
+    }
+
+    state.money += economy.cashFlow;
+    state.stats.lastCashFlow = economy.cashFlow;
+
+    const xpGain = 10 + state.businesses.length * 2 + Math.max(0, economy.cashFlow / 250);
+    gainXP(xpGain);
+
+    const diffCfg = DIFFICULTY_CONFIG[state.difficulty];
+    if (diffCfg.eventChance > 0) {
+      triggerRandomEvent();
+    }
+
+    if (economy.cashFlow >= 0) {
+      addLog("Daily report", `Income $${formatMoney(economy.totalIncome)}, costs $${formatMoney(economy.totalUpkeep)}. Net $${formatMoney(economy.cashFlow)}.`, "positive");
+    } else {
+      addLog("Daily report", `Income $${formatMoney(economy.totalIncome)}, costs $${formatMoney(economy.totalUpkeep)}. Net $${formatMoney(economy.cashFlow)}.`, "negative");
+    }
+
+    const threshold = diffCfg.bankruptcyThreshold;
+    if (state.money < threshold) {
+      addLog("Bankruptcy warning", "Cash reserves are dangerously low. Cut costs or raise capital.", "negative");
+    }
+
+    state.day++;
+    state.phaseIndex = 0;
+    state.marketMood = Math.random() < 0.5 ? "Stable" : (Math.random() < 0.5 ? "Bullish" : "Choppy");
+
+    updateNetWorth();
+    markDirty();
+    updateUI();
+    if (state.autosave) saveGame();
+  }
+
+  function advancePhase(manual = true) {
+    const diff = state.difficulty;
+    if (diff === "easy") {
+      // Easy: still multi‑phase visually, but resolve every press for speed
+      resolveDay();
+      return;
+    }
+
+    state.phaseIndex++;
+    if (state.phaseIndex >= PHASES.length) {
+      resolveDay();
+    } else {
+      updatePhaseUI();
+      addLog("Phase", `You moved into ${PHASES[state.phaseIndex]}.`, "neutral");
+      markDirty();
+      updateUI();
+    }
+  }
+
+  function saveGame() {
+    try {
+      const data = JSON.stringify(state);
+      localStorage.setItem(STORAGE_KEY, data);
+      state.dirty = false;
+      el("saveDot").classList.remove("dirty");
+      el("saveStatusText").textContent = "Game saved";
+      state.lastSave = new Date().toISOString();
+      el("lastSaveDisplay").textContent = new Date(state.lastSave).toLocaleString();
+    } catch (e) {
+      console.error("Save failed", e);
+      el("saveStatusText").textContent = "Save failed";
+    }
+  }
+
+  function loadGame() {
+    try {
+      const data = localStorage.getItem(STORAGE_KEY);
+      if (!data) {
+        addLog("No save", "No saved game found.", "negative");
+        return;
+      }
+      const loaded = JSON.parse(data);
+      Object.assign(state, loaded);
+      state.dirty = false;
+      el("saveDot").classList.remove("dirty");
+      el("saveStatusText").textContent = "Game loaded";
+      if (state.lastSave) el("lastSaveDisplay").textContent = new Date(state.lastSave).toLocaleString();
+      applyTheme(state.theme || "carbon");
+      updateNetWorth();
+      updateUI();
+      addLog("Welcome back", "Your empire has been restored.", "positive");
+      el("mainMenuOverlay").style.display = "none";
+      el("gameRoot").classList.remove("hidden");
+    } catch (e) {
+      console.error("Load failed", e);
+      addLog("Load failed", "Could not load your previous game.", "negative");
+    }
+  }
+
+  function resetGame() {
+    Object.assign(state, {
+      companyName: "Unnamed Corp",
+      ceoName: "You",
+      difficulty: state.difficulty || "easy",
+      day: 1,
+      phaseIndex: 0,
+      money: 0,
+      netWorth: 0,
+      xp: 0,
+      level: 1,
+      businesses: [],
+      research: {},
+      staff: {},
+      marketMood: "Stable",
+      lastSave: null,
+      autosave: true,
+      dirty: false,
+      stats: { totalIncome: 0, totalUpkeep: 0, lastCashFlow: 0 },
+      loans: { principal: 0, dailyRate: 0, minPayment: 0 },
+      condensed: state.condensed,
+      theme: state.theme || "carbon"
+    });
+    el("lastSaveDisplay").textContent = "Never";
+    el("saveDot").classList.remove("dirty");
+    el("saveStatusText").textContent = "Game reset";
+    updateUI();
+  }
+
+  function startNewGameFromMenu() {
+    const diffBtn = document.querySelector("#menuDifficultySelect button.active");
+    const difficulty = diffBtn ? diffBtn.getAttribute("data-difficulty") : "easy";
+    state.difficulty = difficulty;
+    resetGame();
+    state.companyName = randomCompanyName();
+    state.ceoName = "You";
+    state.money = DIFFICULTY_CONFIG[state.difficulty].startingMoney;
+    addLog("New company", `${state.companyName} launches with $${formatMoney(state.money)} in capital on ${DIFFICULTY_CONFIG[state.difficulty].label} mode.`, "positive");
+    updateNetWorth();
+    markDirty();
+    updateUI();
+    el("mainMenuOverlay").style.display = "none";
+    el("gameRoot").classList.remove("hidden");
+  }
+
+  function showModal(id) {
+    el(id).classList.add("active");
+  }
+
+  function hideModal(id) {
+    el(id).classList.remove("active");
+  }
+
+  function setupUI() {
+    document.querySelectorAll(".menu button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+        document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
+        el(tab).classList.add("active");
+      });
+    });
+
+    document.querySelectorAll("#menuDifficultySelect button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#menuDifficultySelect button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+    });
+
+    function bindThemeButtons(containerId) {
+      document.querySelectorAll(`#${containerId} button`).forEach(btn => {
+        btn.addEventListener("click", () => {
+          const theme = btn.getAttribute("data-theme");
+          applyTheme(theme);
+        });
+      });
+    }
+    bindThemeButtons("themeSelect");
+    bindThemeButtons("settingsThemeSelect");
+
+    el("menuPlayBtn").addEventListener("click", () => {
+      startNewGameFromMenu();
+    });
+    el("menuLoadBtn").addEventListener("click", () => {
+      loadGame();
+    });
+
+    el("newGameBtn").addEventListener("click", () => {
+      el("mainMenuOverlay").style.display = "flex";
+      el("gameRoot").classList.add("hidden");
+    });
+
+    el("openLoansBtn").addEventListener("click", () => {
+      showModal("loanModal");
+      updateLoanUI();
+    });
+    el("loanAmountInput").addEventListener("input", updateLoanUI);
+    el("takeLoanBtn").addEventListener("click", () => {
+      const amount = parseFloat(el("loanAmountInput").value || "0");
+      if (!amount || amount <= 0) return;
+      const diffCfg = DIFFICULTY_CONFIG[state.difficulty];
+      const rate = diffCfg.loanRate;
+      const minPayment = Math.max(50, amount * 0.05);
+      state.loans.principal += amount;
+      state.loans.dailyRate = rate;
+      state.loans.minPayment = minPayment;
+      state.money += amount;
+      addLog("Loan taken", `You borrowed $${formatMoney(amount)} at ${(rate * 100).toFixed(1)}% daily interest.`, "negative");
+      markDirty();
+      updateNetWorth();
+      updateUI();
+    });
+    el("payMinLoanBtn").addEventListener("click", () => {
+      if (state.loans.principal <= 0 || state.money <= 0) return;
+      const payment = Math.min(state.loans.minPayment, state.money);
+      state.money -= payment;
+      state.loans.principal = Math.max(0, state.loans.principal - payment);
+      addLog("Loan payment", `You paid $${formatMoney(payment)} toward your loan.`, "positive");
+      markDirty();
+      updateNetWorth();
+      updateUI();
+    });
+    el("payAllLoanBtn").addEventListener("click", () => {
+      if (state.loans.principal <= 0 || state.money <= 0) return;
+      const payment = Math.min(state.loans.principal, state.money);
+      state.money -= payment;
+      state.loans.principal -= payment;
+      addLog("Loan cleared", `You paid $${formatMoney(payment)} and reduced your debt.`, "positive");
+      markDirty();
+      updateNetWorth();
+      updateUI();
+    });
+
+    el("openSettingsBtn").addEventListener("click", () => {
+      showModal("settingsModal");
+    });
+    el("toggleCondensedBtn").addEventListener("click", () => {
+      state.condensed = !state.condensed;
+      document.body.style.setProperty("--card-radius", state.condensed ? "7px" : "11px");
+      markDirty();
+    });
+
+    document.querySelectorAll("[data-close]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-close");
+        hideModal(id);
+      });
+    });
+
+    el("saveBtn").addEventListener("click", saveGame);
+    el("loadBtn").addEventListener("click", loadGame);
+
+    document.addEventListener("keydown", e => {
+      if (e.key === " " && !e.repeat) {
+        e.preventDefault();
+        if (!el("gameRoot").classList.contains("hidden")) advancePhase(true);
+      } else if (e.key === "s" || e.key === "S") {
+        saveGame();
+      } else if (e.key === "l" || e.key === "L") {
+        loadGame();
+      } else if (e.key === "Escape") {
+        hideModal("loanModal");
+        hideModal("settingsModal");
+      } else if (["1", "2", "3", "4"].includes(e.key)) {
+        const tabs = ["cityTab", "researchTab", "staffTab", "marketTab"];
+        const index = parseInt(e.key, 10) - 1;
+        const tabId = tabs[index];
+        if (!tabId) return;
+        document.querySelectorAll(".menu button").forEach(btn => {
+          btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
+        });
+        document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
+        el(tabId).classList.add("active");
+      }
+    });
+
+    setInterval(() => {
+      const assistants = state.staff["assistant"] || 0;
+      if (assistants > 0 && state.businesses.length > 0 && !el("gameRoot").classList.contains("hidden")) {
+        const chance = 0.03 * assistants;
+        if (Math.random() < chance) advancePhase(false);
+      }
+    }, 2500);
+  }
+
+  function init() {
+    setupUI();
+    applyTheme("carbon");
+    updateUI();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
