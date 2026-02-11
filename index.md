@@ -1,3 +1,3 @@
 <script>
-  window.location.href = "important.md.html";
+  window.location.href = "important_stuff_v1.1.html";
 </script>
