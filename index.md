@@ -1,4 +1,3 @@
----
-layout: default
-title: Home
----
+<script>
+  window.location.href = "important.md.html";
+</script>
